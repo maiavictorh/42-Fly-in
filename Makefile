@@ -1,21 +1,23 @@
-P3 = python3
 VENV = .venv
 PIP = $(VENV)/bin/pip
-P3_VENV = $(VENV)/bin/python3
+P3 = $(VENV)/bin/python3
 FLAKE8 = $(VENV)/bin/flake8
 MYPY = $(VENV)/bin/mypy
 RM = rm -rf
 
 MAIN = main.py
+CONFIG = config.txt
 
-all: run
+run: .venv
+	clear
+	$(P3) $(MAIN) $(CONFIG)
 
-install:
-	$(P3) -m venv $(VENV)
+.venv:
+	python3 -m venv $(VENV)
 	$(PIP) install --upgrade pip
 	$(PIP) install -r requirements.txt
 
-run:
+install: .venv
 
 debug:
 
@@ -41,4 +43,4 @@ lint-strict:
 	$(FLAKE8) . --exclude $(VENV)
 	$(MYPY) . --strict
 
-.PHONY: all install run debug clean fclean re lint lint-strict
+.PHONY: run install debug clean fclean re lint lint-strict
