@@ -24,8 +24,9 @@ class Connection:
 class Parser:
     def __init__(self, file_name: str):
         self.file_name = file_name
-        self.hubs = []
-        self.connections = []
+        self.nb_drones: int | None = None
+        self.hubs: list[Hub] = []
+        self.connections: list[Connection] = []
 
     def parse(self) -> None:
         with open(self.file_name, "r") as file:
@@ -59,13 +60,13 @@ class Parser:
 
         handler(value, index)
 
-    def _parse_nb_drones(self, value: str, line_index: int) -> int:
+    def _parse_nb_drones(self, value: str, line_index: int) -> None:
         nb_drones = self.validate_int(value, line_index)
 
         if nb_drones < 1:
             raise ParserError("Must contain at least one drone")
 
-        return nb_drones
+        self.nb_drones = nb_drones
 
     def _parse_hub(self, value: str, line_index: int) -> None:
         values = value.split(" ", 3)
@@ -106,7 +107,7 @@ class Parser:
                 self.validate_int(raw_metadata[1], line_index)
 
             self.connections.append(
-                Connection(connections[0], connections[1], data))
+                Connection(connections[0], connections[1], metadata))
 
         elif data is None:
             self.connections.append(

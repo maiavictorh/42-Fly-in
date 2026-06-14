@@ -18,6 +18,17 @@ def main() -> None:
         parser = Parser(argv[1])
         parser.parse()
 
+        print("nb_drones:", parser.nb_drones)
+        print()
+        for h in parser.hubs:
+            print(f"name: {h.name} | coord: {h.coord} ",
+                  f"| metadata: {h.metadata}")
+        print()
+
+        for co in parser.connections:
+            print(f"hub_1: {co.hub_1} | hub_2: {co.hub_2} "
+                  f"| metadata: {co.metadata}")
+
     except (ValueError, ParserError) as err:
         print(RED, err, NC)
         exit()
