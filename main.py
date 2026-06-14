@@ -3,7 +3,7 @@ from parser import Parser, ParserError
 
 
 def main() -> None:
-    PURPLE = "\33[35m"
+    PURPLE = "\33[1;35m"
     GREEN = "\33[32m"
     RED = "\33[31m"
     NC = "\33[0m"
