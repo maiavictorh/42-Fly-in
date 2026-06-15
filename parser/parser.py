@@ -25,6 +25,8 @@ class Parser:
     def __init__(self, file_name: str):
         self.file_name = file_name
         self.nb_drones: int | None = None
+        self.start_hub: Hub | None = None
+        self.end_hub: Connection | None = None
         self.hubs: list[Hub] = []
         self.connections: list[Connection] = []
 
@@ -66,6 +68,10 @@ class Parser:
         if nb_drones < 1:
             raise ParserError("Must contain at least one drone")
 
+        if self.nb_drones is not None:
+            raise ParserError(
+                f"Duplicated number of drones on line: {line_index}"
+                )
         self.nb_drones = nb_drones
 
     def _parse_hub(self, value: str, line_index: int) -> None:
@@ -76,6 +82,11 @@ class Parser:
             raise ParserError(f"Invalid hub in line: {line_index}")
 
         name = self.validate_str(values[0], line_index)
+
+        for hub in self.hubs:
+            if name == hub.name:
+                raise ParserError(f"Duplicated hub name in line: {line_index}")
+
         x = self.validate_int(values[1], line_index)
         y = self.validate_int(values[2], line_index)
 
