@@ -34,14 +34,26 @@ class Parser:
         with open(self.file_name, "r") as file:
 
             for index, line in enumerate(start=1, iterable=file):
-                line = line.strip()
 
+                line = line.strip()
                 if not line or line.startswith("#"):
                     continue
                 elif ":" not in line:
                     raise ParserError(f"Invalid line: {index}")
 
                 self._handle_line(line, index)
+
+                hub_names = []
+                for hub in self.hubs:
+                    hub_names.append(hub.name)
+
+                for connection in self.connections:
+                    if connection.hub_1 not in hub_names:
+                        raise ParserError("Invalid connection (First hub "
+                                          f"not defined) in line: {index}")
+                    if connection.hub_2 not in hub_names:
+                        raise ParserError("Invalid connection (Second hub "
+                                          f"not defined) in line: {index}")
 
     def _handle_line(self, line: str, index: int) -> None:
         key, value = line.split(":", 1)
