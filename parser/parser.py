@@ -55,7 +55,7 @@ class Parser:
                         raise ParserError("Invalid connection (Second hub "
                                           f"not defined) in line: {index}")
 
-    def _handle_line(self, line: str, index: int) -> None:
+    def _handle_line(self, line: str, line_index: int) -> None:
         key, value = line.split(":", 1)
         key, value = key.strip(), value.strip()
 
@@ -67,12 +67,21 @@ class Parser:
             "connection": self._parse_connection
         }
 
+        if key == "start_hub":
+            print("antedeguemon")
+            if self.start_hub:
+                raise ParserError(
+                    f"Duplicated Start hub in line: {line_index}")
+        if key == "end_hub":
+            if self.end_hub is not None:
+                raise ParserError(
+                    f"Duplicated End hub in line: {line_index}")
         handler = handlers.get(key)
 
         if not handler:
-            raise ParserError(f"Invalid directive in line {index}")
+            raise ParserError(f"Invalid directive in line {line_index}")
 
-        handler(value, index)
+        handler(value, line_index)
 
     def _parse_nb_drones(self, value: str, line_index: int) -> None:
         nb_drones = self.validate_int(value, line_index)
@@ -82,8 +91,8 @@ class Parser:
 
         if self.nb_drones is not None:
             raise ParserError(
-                f"Duplicated number of drones on line: {line_index}"
-                )
+                f"Duplicated number of drones on line: {line_index}")
+
         self.nb_drones = nb_drones
 
     def _parse_hub(self, value: str, line_index: int) -> None:

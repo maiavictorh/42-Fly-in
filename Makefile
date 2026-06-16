@@ -20,6 +20,7 @@ run: .venv
 install: .venv
 
 debug:
+	$(P3) -m pdb $(MAIN) $(CONFIG)
 
 clean:
 	$(RM) .mypy_cache
