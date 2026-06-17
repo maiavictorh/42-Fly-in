@@ -1,27 +1,8 @@
-from typing import Any, Optional
+from .utils import Processor, ParserError
+from .models import Hub, Connection
 
 
-class ParserError(Exception):
-    ...
-
-
-class Hub:
-    def __init__(self, name: str, coord: tuple[int, int],
-                 metadata: Optional[dict[str, Any]] = None) -> None:
-        self.name = name
-        self.coord = coord
-        self.metadata = metadata
-
-
-class Connection:
-    def __init__(self, hub_1: str, hub_2: str,
-                 metadata: Optional[dict[str, Any]] = None) -> None:
-        self.hub_1 = hub_1
-        self.hub_2 = hub_2
-        self.metadata = metadata
-
-
-class Parser:
+class Parser(Processor):
     def __init__(self, file_name: str):
         self.file_name = file_name
         self.nb_drones: int | None = None
@@ -39,7 +20,8 @@ class Parser:
                 if not line or line.startswith("#"):
                     continue
                 elif ":" not in line:
-                    raise ParserError(f"Invalid line: {line_index}")
+                    raise ParserError(
+                        f"Invalid syntax (missing ':') in line: {line_index}")
 
                 self._handle_line(line, line_index)
 
@@ -59,8 +41,20 @@ class Parser:
                             "Invalid connection (Second hub "
                             f"not defined) in line: {line_index}")
 
-                # for coord in hub_coords:
-                #     if
+                checked_pairs: set[frozenset[str]] = set()
+                for connection in self.connections:
+                    conn_pair = frozenset((connection.hub_1, connection.hub_2))
+                    if conn_pair in checked_pairs:
+                        raise ParserError(
+                            f"Duplicated connection in line: {line_index}")
+                    checked_pairs.add(conn_pair)
+
+        if self.nb_drones is None:
+            raise ParserError("Missing nb_drones directive")
+        if self.start_hub is None:
+            raise ParserError("Missing start_hub directive")
+        if self.end_hub is None:
+            raise ParserError("Missing end_hub directive")
 
     def _handle_line(self, line: str, line_index: int) -> None:
         key, value = line.split(":", 1)
@@ -77,12 +71,13 @@ class Parser:
         handler = handlers.get(key)
 
         if not handler:
-            raise ParserError(f"Invalid directive in line {line_index}")
+            raise ParserError(
+                f"Invalid directive \"{key}\" in line {line_index}")
 
         handler(value, line_index)
 
     def _parse_nb_drones(self, value: str, line_index: int) -> None:
-        nb_drones = self.validate_int(value, line_index)
+        nb_drones = self.process_int(value, line_index, True)
 
         if nb_drones < 1:
             raise ParserError("Must contain at least one drone")
@@ -110,89 +105,67 @@ class Parser:
     def _parse_hub(self, value: str, line_index: int) -> None:
         self._create_hub(value, line_index)
 
+    def _create_hub(self, value: str, line_index: int) -> Hub:
+        values = value.split(" ", 3)
+        metadata = None
+        hub = None
+
+        if len(values) < 3:
+            raise ParserError(f"Invalid hub in line: {line_index}")
+
+        name = self.process_str(values[0], line_index)
+
+        for h in self.hubs:
+            if name == h.name:
+                raise ParserError(f"Duplicated hub name in line: {line_index}")
+
+        x = self.process_int(values[1], line_index)
+        y = self.process_int(values[2], line_index)
+
+        if len(values) > 3:
+            metadata = self.process_metadata(values[3], line_index)
+
+            hub = Hub(name, (x, y), metadata)
+
+        else:
+            hub = Hub(name, (x, y))
+
+        self.hubs.append(hub)
+        return hub
+
     def _parse_connection(self, value: str, line_index: int) -> None:
-        connections = value.split("-", 1)
+        hubs = value.split("-", 1)
         data = None
         metadata = {}
 
-        for hub in connections:
+        for hub in hubs:
             if "[" in hub:
                 raw_data = hub.split(" ", 1)
-                connections[1] = raw_data[0]
+                hubs[1] = raw_data[0]
                 data = raw_data[1].strip("[]")
 
-        if "-" in connections[0] or "-" in connections[1]:
+        if len(hubs) < 2:
+            raise ParserError(
+                f"Invalid connection syntax in line: {line_index}")
+
+        if "-" in hubs[0] or "-" in hubs[1]:
             raise ParserError(f"Invalid connection name in line: {line_index}")
 
-        if connections[0] == connections[1]:
+        if hubs[0] == hubs[1]:
             raise ParserError("Invalid connection (same hub on both ends)"
                               f" in line: {line_index}")
 
         if data is not None:
             raw_metadata = data.split("=", 1)
+            if raw_metadata[0] != "max_link_capacity":
+                raise ParserError(
+                    f"Invalid metadata for connection in line: {line_index}")
             metadata[raw_metadata[0]] = \
-                self.validate_int(raw_metadata[1], line_index)
+                self.process_int(raw_metadata[1], line_index)
 
             self.connections.append(
-                Connection(connections[0], connections[1], metadata))
-
-        elif data is None:
-            self.connections.append(
-                Connection(connections[0], connections[1]))
-
-    @staticmethod
-    def validate_int(value: str, line_index: int) -> int:
-        try:
-            new_value = int(value)
-        except ValueError:
-            raise ParserError(f"Expected integer in line: {line_index}")
-
-        if new_value < 0:
-            raise ValueError(f"Negative Input in line: {line_index}")
-        return new_value
-
-    @staticmethod
-    def validate_str(value: str, line_index: int) -> str:
-        if len(value.strip()) == 0:
-            raise ValueError(f"Empty input in line: {line_index}")
-        return value
-
-    @staticmethod
-    def validate_metadata(value: str, line_index: int) -> dict[str, Any]:
-        raw_data = value.split(" ")
-        data = {}
-
-        for raw in raw_data:
-            raw = raw.strip("[]")
-            if "=" not in raw:
-                raise ValueError(f"Invalid metadata in line: {line_index}")
-            d = raw.split("=", 1)
-            data[d[0]] = d[1]
-
-        return data
-
-    def _create_hub(self, value: str, line_index: int) -> Hub:
-        values = value.split(" ", 3)
-        metadata = None
-
-        if len(values) < 3:
-            raise ParserError(f"Invalid hub in line: {line_index}")
-
-        name = self.validate_str(values[0], line_index)
-
-        for hub in self.hubs:
-            if name == hub.name:
-                raise ParserError(f"Duplicated hub name in line: {line_index}")
-
-        x = self.validate_int(values[1], line_index)
-        y = self.validate_int(values[2], line_index)
-
-        if len(values) > 3:
-            metadata = self.validate_metadata(values[3], line_index)
-
-            self.hubs.append(Hub(name, (x, y), metadata))
+                Connection(hubs[0], hubs[1], metadata))
 
         else:
-            self.hubs.append(Hub(name, (x, y)))
-
-        return Hub(name, (x, y), metadata)
+            self.connections.append(
+                Connection(hubs[0], hubs[1]))

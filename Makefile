@@ -6,11 +6,10 @@ MYPY = $(VENV)/bin/mypy
 RM = rm -rf
 
 MAIN = main.py
-CONFIG = config.txt
 
 run: .venv
 	clear
-	$(P3) $(MAIN) $(CONFIG)
+	$(P3) $(MAIN)
 
 .venv:
 	python3 -m venv $(VENV)
@@ -20,7 +19,7 @@ run: .venv
 install: .venv
 
 debug:
-	$(P3) -m pdb $(MAIN) $(CONFIG)
+	$(P3) -m pdb $(MAIN)
 
 clean:
 	$(RM) .mypy_cache
