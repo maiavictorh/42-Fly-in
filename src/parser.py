@@ -29,6 +29,10 @@ class Parser(Processor):
                 hub_coords = []
                 for hub in self.hubs:
                     hub_names.append(hub.name)
+                    if hub.coord in hub_coords:
+                        raise ParserError(
+                            "Duplicated coordinates for hub "
+                            f"in line: {line_index}")
                     hub_coords.append(hub.coord)
 
                 for connection in self.connections:
@@ -111,7 +115,8 @@ class Parser(Processor):
         hub = None
 
         if len(values) < 3:
-            raise ParserError(f"Invalid hub in line: {line_index}")
+            raise ParserError(
+                f"Missing parameter for hub in line: {line_index}")
 
         name = self.process_str(values[0], line_index)
 
@@ -123,6 +128,9 @@ class Parser(Processor):
         y = self.process_int(values[2], line_index)
 
         if len(values) > 3:
+            # if "[" not in values[3]:
+            #     raise ParserError(
+            #         f"Invalid metadata for hub in line: {line_index}")
             metadata = self.process_metadata(values[3], line_index)
 
             hub = Hub(name, (x, y), metadata)
@@ -134,15 +142,23 @@ class Parser(Processor):
         return hub
 
     def _parse_connection(self, value: str, line_index: int) -> None:
+
+        if "-" not in value:
+            raise ParserError(
+                f"Invalid connection syntax in line: {line_index}")
+
         hubs = value.split("-", 1)
         data = None
         metadata = {}
 
-        for hub in hubs:
-            if "[" in hub:
-                raw_data = hub.split(" ", 1)
-                hubs[1] = raw_data[0]
-                data = raw_data[1].strip("[]")
+        if "[" in hubs[1]:
+            if " " not in hubs[1]:
+                raise ParserError(
+                    f"Invalid connection syntax in line: {line_index}"
+                )
+            raw_data = hubs[1].split(" ", 1)
+            hubs[1] = raw_data[0]
+            data = raw_data[1].strip("[]")
 
         if len(hubs) < 2:
             raise ParserError(
@@ -162,6 +178,9 @@ class Parser(Processor):
                     f"Invalid metadata for connection in line: {line_index}")
             metadata[raw_metadata[0]] = \
                 self.process_int(raw_metadata[1], line_index)
+            if metadata["max_link_capacity"] < 1:
+                raise ParserError(
+                    f"Invalid metadata value in line: {line_index}")
 
             self.connections.append(
                 Connection(hubs[0], hubs[1], metadata))

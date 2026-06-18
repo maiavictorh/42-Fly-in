@@ -30,16 +30,22 @@ class Processor(ABC):
             raise ValueError(f"Empty input in line: {line_index}")
         return value
 
-    @staticmethod
-    def process_metadata(value: str, line_index: int) -> dict[str, Any]:
+    def process_metadata(self, value: str, line_index: int) -> dict[str, Any]:
         raw_data = value.split(" ")
         data = {}
+        valid_metadata = ["zone", "color", "max_drones"]
 
         for raw in raw_data:
             raw = raw.strip("[]")
             if "=" not in raw:
                 raise ValueError(f"Invalid metadata in line: {line_index}")
             d = raw.split("=", 1)
-            data[d[0]] = d[1]
+            if d[0] not in valid_metadata:
+                raise ParserError(
+                    f"Invalid metadata value in line: {line_index}")
+            if d[0] == "max_drones":
+                data[d[0]] = self.process_int(d[1], line_index)
+            else:
+                data[d[0]] = d[1]
 
         return data

@@ -1,6 +1,16 @@
 from typing import Optional, Any
 
 
+class Graph:
+    def __init__(self) -> None:
+        pass
+
+
+class Drone:
+    def __init__(self) -> None:
+        pass
+
+
 class Hub:
     def __init__(self, name: str, coord: tuple[int, int],
                  metadata: Optional[dict[str, Any]] = None) -> None:

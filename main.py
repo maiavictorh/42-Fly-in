@@ -1,6 +1,7 @@
 from sys import exit
 from src import Parser, ParserError
 from time import sleep
+from typing import Any
 
 
 PURPLE = "\33[1;35m"
@@ -14,22 +15,7 @@ BOLD = "\33[1m"
 CLEAR = "\33c"
 
 
-# TEST
-def print_info(parser: Parser) -> None:
-    print("nb_drones:", parser.nb_drones)
-
-    print("\nHubs:")
-    for h in parser.hubs:
-        print(f"  name: {h.name} | coord: {h.coord} "
-              f"| metadata: {h.metadata}")
-
-    print("\nConnections:")
-    for co in parser.connections:
-        print(f"  hub_1: {co.hub_1} | hub_2: {co.hub_2} "
-              f"| metadata: {co.metadata}")
-
-
-def menu() -> str:
+def menu() -> Any:
     maps = {
         "easy": {
             "1": "maps/easy/01_linear_path.txt",
@@ -51,7 +37,7 @@ def menu() -> str:
         }
     }
 
-    choice = None
+    choice: Any = "config.txt"
 
     print(CLEAR)
     print(f"  {PURPLE}╔══════════════════════════╗")
@@ -73,18 +59,18 @@ def menu() -> str:
             print("    3. Basic_capacity.txt")
             match input("\n   Choice: (1-3) or Quit: "):
                 case "1":
-                    choice = maps.get("easy").get("1")
+                    choice = maps["easy"]["1"]
                 case "2":
-                    choice = maps.get("easy").get("2")
+                    choice = maps["easy"]["2"]
                 case "3":
-                    choice = maps.get("easy").get("3")
+                    choice = maps["easy"]["3"]
                 case "Quit" | "quit" | "q":
                     print(CLEAR)
-                    menu()
+                    return menu()
                 case _:
                     print(YELLOW, "   \33[5mInvalid Option...\n", NC)
                     sleep(2)
-                    menu()
+                    return menu()
         case "2":
             print(CLEAR)
             print(f"   {YELLOW}{BOLD}=== Medium ==={NC}")
@@ -93,18 +79,18 @@ def menu() -> str:
             print("    3. Priority_puzzle.txt")
             match input("\n   Choice: (1-3) or Quit: "):
                 case "1":
-                    choice = maps.get("medium").get("1")
+                    choice = maps["easy"]["1"]
                 case "2":
-                    choice = maps.get("medium").get("2")
+                    choice = maps["easy"]["2"]
                 case "3":
-                    choice = maps.get("medium").get("3")
+                    choice = maps["easy"]["3"]
                 case "Quit" | "quit" | "q":
                     print(CLEAR)
-                    menu()
+                    return menu()
                 case _:
                     print(YELLOW, "   \33[5mInvalid Option...\n", NC)
                     sleep(2)
-                    menu()
+                    return menu()
         case "3":
             print(CLEAR)
             print(f"   {RED}{BOLD}=== Hard ==={NC}")
@@ -113,20 +99,20 @@ def menu() -> str:
             print("    3. Priority_puzzle.txt")
             match input("\n   Choice: (1-3) or Quit: "):
                 case "1":
-                    choice = maps.get("hard").get("1")
+                    choice = maps["hard"]["1"]
                 case "2":
-                    choice = maps.get("hard").get("2")
+                    choice = maps["hard"]["2"]
                 case "3":
-                    choice = maps.get("hard").get("3")
+                    choice = maps["hard"]["3"]
                 case "Quit" | "quit" | "q":
                     print(CLEAR)
-                    menu()
+                    return menu()
                 case _:
                     print(YELLOW, "   \33[5mInvalid Option...\n", NC)
                     sleep(2)
-                    menu()
+                    return menu()
         case "4":
-            choice = maps.get("challenger").get("1")
+            choice = maps["challenger"]["1"]
         case "5":
             choice = "config.txt"
         case "Quit" | "quit" | "q":
@@ -136,7 +122,7 @@ def menu() -> str:
             print(YELLOW, "   \33[5mInvalid Option...\n", NC)
             sleep(2)
             print(CLEAR)
-            menu()
+            return menu()
 
     return choice
 
@@ -151,8 +137,19 @@ def main() -> None:
 
         print(CLEAR)
         print(PURPLE, "\n===== Initiating primary Test =====\n", NC)
+
         print(f"\n{map}\n")
-        print_info(parser)
+        print("nb_drones:", parser.nb_drones)
+
+        print("\nHubs:")
+        for h in parser.hubs:
+            print(f"  name: {h.name} | coord: {h.coord} "
+                  f"| metadata: {h.metadata}")
+
+        print("\nConnections:")
+        for co in parser.connections:
+            print(f"  hub_1: {co.hub_1} | hub_2: {co.hub_2} "
+                  f"| metadata: {co.metadata}")
 
     except (ValueError, ParserError) as err:
         print(f"{RED}Error: {err}\n  {EXIT}Aborting...  {NC}")

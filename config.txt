@@ -22,4 +22,3 @@ connection: tunnelB-end
 #  nb_drones < 1
 #  duplicated nb_drones, start_hub, end_hub
 #  duplicated hub name
-#  Negative input
