@@ -37,94 +37,64 @@ def menu() -> Any:
         }
     }
 
-    choice: Any = "config.txt"
+    while True:
+        print(CLEAR)
+        print(f"  {PURPLE}╔══════════════════════════╗")
+        print(f"  ║          {IT}Fly-in{NC}          {PURPLE}║")
+        print(f"  {PURPLE}╚══════════════════════════╝{NC}")
+        print("   Choose difficulty\n"
+              "    1. Easy\n"
+              "    2. Medium\n"
+              "    3. Hard\n"
+              "    4. Challenger\n"
+              "    5. Custom")
 
-    print(CLEAR)
-    print(f"  {PURPLE}╔══════════════════════════╗")
-    print(f"  ║          {IT}Fly-in{NC}          {PURPLE}║")
-    print(f"  {PURPLE}╚══════════════════════════╝{NC}")
-    print("   Choose difficulty\n"
-          "    1. Easy\n"
-          "    2. Medium\n"
-          "    3. Hard\n"
-          "    4. Challenger\n"
-          "    5. Custom")
+        choice = input("\n   Choice: (1-5) or Quit: ")
 
-    match input("\n   Choice: (1-5) or Quit: "):
-        case "1":
-            print(CLEAR)
-            print(f"   {GREEN}{BOLD}=== Easy ==={NC}")
-            print("    1. Linear_path.txt")
-            print("    2. Simple_fork.txt")
-            print("    3. Basic_capacity.txt")
-            match input("\n   Choice: (1-3) or Quit: "):
-                case "1":
-                    choice = maps["easy"]["1"]
-                case "2":
-                    choice = maps["easy"]["2"]
-                case "3":
-                    choice = maps["easy"]["3"]
-                case "Quit" | "quit" | "q":
-                    print(CLEAR)
-                    return menu()
-                case _:
-                    print(YELLOW, "   \33[5mInvalid Option...\n", NC)
-                    sleep(2)
-                    return menu()
-        case "2":
-            print(CLEAR)
-            print(f"   {YELLOW}{BOLD}=== Medium ==={NC}")
-            print("    1. Dead_end_trap.txt")
-            print("    2. Circular_loop.txt")
-            print("    3. Priority_puzzle.txt")
-            match input("\n   Choice: (1-3) or Quit: "):
-                case "1":
-                    choice = maps["easy"]["1"]
-                case "2":
-                    choice = maps["easy"]["2"]
-                case "3":
-                    choice = maps["easy"]["3"]
-                case "Quit" | "quit" | "q":
-                    print(CLEAR)
-                    return menu()
-                case _:
-                    print(YELLOW, "   \33[5mInvalid Option...\n", NC)
-                    sleep(2)
-                    return menu()
-        case "3":
-            print(CLEAR)
-            print(f"   {RED}{BOLD}=== Hard ==={NC}")
-            print("    1. Maze_nightmare.txt")
-            print("    2. Capacity_hell.txt")
-            print("    3. Priority_puzzle.txt")
-            match input("\n   Choice: (1-3) or Quit: "):
-                case "1":
-                    choice = maps["hard"]["1"]
-                case "2":
-                    choice = maps["hard"]["2"]
-                case "3":
-                    choice = maps["hard"]["3"]
-                case "Quit" | "quit" | "q":
-                    print(CLEAR)
-                    return menu()
-                case _:
-                    print(YELLOW, "   \33[5mInvalid Option...\n", NC)
-                    sleep(2)
-                    return menu()
-        case "4":
-            choice = maps["challenger"]["1"]
-        case "5":
-            choice = "config.txt"
-        case "Quit" | "quit" | "q":
+        if choice in ("Quit", "quit", "q"):
             print(CLEAR)
             exit()
-        case _:
+
+        if choice == "4":
+            return maps["challenger"]["1"]
+
+        if choice == "5":
+            return "config.txt"
+
+        if choice not in ("1", "2", "3"):
             print(YELLOW, "   \33[5mInvalid Option...\n", NC)
             sleep(2)
-            print(CLEAR)
-            return menu()
+            continue
 
-    return choice
+        difficulty = {"1": "easy", "2": "medium", "3": "hard"}[choice]
+        labels = {
+            "easy": (GREEN, ["Linear_path.txt",
+                             "Simple_fork.txt",
+                             "Basic_capacity.txt"]),
+            "medium": (YELLOW, ["Dead_end_trap.txt",
+                                "Circular_loop.txt",
+                                "Priority_puzzle.txt"]),
+            "hard": (RED, ["Maze_nightmare.txt",
+                           "Capacity_hell.txt",
+                           "Ultimate_challenge.txt"]),
+        }
+        color, files = labels[difficulty]
+
+        print(CLEAR)
+        print(f"   {color}{BOLD}=== {difficulty.capitalize()} ==={NC}")
+        for i, f in enumerate(files, start=1):
+            print(f"    {i}. {f}")
+
+        sub_choice = input("\n   Choice: (1-3) or Quit: ")
+
+        if sub_choice in ("Quit", "quit", "q"):
+            continue
+
+        if sub_choice in maps[difficulty]:
+            return maps[difficulty][sub_choice]
+
+        print(YELLOW, "   \33[5mInvalid Option...\n", NC)
+        sleep(2)
 
 
 def main() -> None:
@@ -138,8 +108,9 @@ def main() -> None:
         print(CLEAR)
         print(PURPLE, "\n===== Initiating primary Test =====\n", NC)
 
-        print(f"\n{map}\n")
-        print("nb_drones:", parser.nb_drones)
+        # =================== TEST =================== #
+        # print(f"{map}\n")
+        # print("nb_drones:", parser.nb_drones)
 
         print("\nHubs:")
         for h in parser.hubs:
@@ -150,8 +121,9 @@ def main() -> None:
         for co in parser.connections:
             print(f"  hub_1: {co.hub_1} | hub_2: {co.hub_2} "
                   f"| metadata: {co.metadata}")
+        # ============================================ #
 
-    except (ValueError, ParserError) as err:
+    except ParserError as err:
         print(f"{RED}Error: {err}\n  {EXIT}Aborting...  {NC}")
         exit(1)
 

@@ -30,9 +30,8 @@ class Parser(Processor):
                 for hub in self.hubs:
                     hub_names.append(hub.name)
                     if hub.coord in hub_coords:
-                        raise ParserError(
-                            "Duplicated coordinates for hub "
-                            f"in line: {line_index}")
+                        raise ParserError("Duplicated coordinates for hub "
+                                          f"in line: {line_index}")
                     hub_coords.append(hub.coord)
 
                 for connection in self.connections:
@@ -113,12 +112,17 @@ class Parser(Processor):
         values = value.split(" ", 3)
         metadata = None
         hub = None
+        invalid_chars = ['-', '=', '[', ']']
 
         if len(values) < 3:
             raise ParserError(
                 f"Missing parameter for hub in line: {line_index}")
 
         name = self.process_str(values[0], line_index)
+        for char in invalid_chars:
+            if char in name:
+                raise ParserError(
+                    f"Invalid character for hub name in line: {line_index}")
 
         for h in self.hubs:
             if name == h.name:
@@ -128,9 +132,6 @@ class Parser(Processor):
         y = self.process_int(values[2], line_index)
 
         if len(values) > 3:
-            # if "[" not in values[3]:
-            #     raise ParserError(
-            #         f"Invalid metadata for hub in line: {line_index}")
             metadata = self.process_metadata(values[3], line_index)
 
             hub = Hub(name, (x, y), metadata)
@@ -154,10 +155,12 @@ class Parser(Processor):
         if "[" in hubs[1]:
             if " " not in hubs[1]:
                 raise ParserError(
-                    f"Invalid connection syntax in line: {line_index}"
-                )
+                    f"Invalid connection syntax in line: {line_index}")
             raw_data = hubs[1].split(" ", 1)
             hubs[1] = raw_data[0]
+            if "[" not in raw_data[1] or "]" not in raw_data[1]:
+                raise ParserError("Invalid metadata syntax "
+                                  f"for connection in line: {line_index}")
             data = raw_data[1].strip("[]")
 
         if len(hubs) < 2:
