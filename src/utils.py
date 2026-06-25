@@ -1,4 +1,3 @@
-from abc import ABC
 from typing import Optional, Any
 from enum import Enum
 
@@ -14,7 +13,7 @@ class ZoneType(Enum):
     PRIORITY = "priority"
 
 
-class Processor(ABC):
+class Processor:
     def __init__(self) -> None:
         pass
 

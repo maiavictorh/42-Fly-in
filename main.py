@@ -80,7 +80,7 @@ def menu() -> Any:
         }
         color, files = labels[difficulty]
 
-        # print(CLEAR)
+        print(CLEAR)
         print(f"   {PURPLE}┌──────────────┐")
         print(f"   │    {color}{BOLD}{difficulty.capitalize()}"
               f" {NC}{PURPLE}   │")
