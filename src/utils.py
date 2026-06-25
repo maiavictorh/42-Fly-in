@@ -1,9 +1,17 @@
 from abc import ABC
 from typing import Optional, Any
+from enum import Enum
 
 
 class ParserError(Exception):
     ...
+
+
+class ZoneType(Enum):
+    NORMAL = "normal"
+    BLOCKED = "blocked"
+    RESTRICTED = "restricted"
+    PRIORITY = "priority"
 
 
 class Processor(ABC):
@@ -26,9 +34,10 @@ class Processor(ABC):
 
     @staticmethod
     def process_str(value: str, line_index: int) -> str:
-        if len(value.strip()) == 0:
+        new_value = value.strip()
+        if len(new_value) == 0:
             raise ParserError(f"Empty input in line: {line_index}")
-        return value
+        return new_value
 
     def process_metadata(self, value: str, line_index: int) -> dict[str, Any]:
         raw_data = value.split(" ")

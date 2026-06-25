@@ -106,13 +106,19 @@ class Parser(Processor):
         self.end_hub = self._create_hub(value, line_index)
 
     def _parse_hub(self, value: str, line_index: int) -> None:
+
         self._create_hub(value, line_index)
 
     def _create_hub(self, value: str, line_index: int) -> Hub:
+
+        if self.nb_drones is None:
+            raise ParserError(
+                "nb_drones must be defined first")
+
         values = value.split(" ", 3)
         metadata = None
         hub = None
-        invalid_chars = ['-', '=', '[', ']']
+        invalid_chars = ['-', '=', '[', ']', ' ']
 
         if len(values) < 3:
             raise ParserError(
@@ -143,6 +149,10 @@ class Parser(Processor):
         return hub
 
     def _parse_connection(self, value: str, line_index: int) -> None:
+
+        if self.nb_drones is None:
+            raise ParserError(
+                "nb_drones must be defined first")
 
         if "-" not in value:
             raise ParserError(
@@ -175,6 +185,8 @@ class Parser(Processor):
                               f" in line: {line_index}")
 
         if data is not None:
+            if "=" not in data:
+                raise ParserError(f"Invalid metadata in line: {line_index}")
             raw_metadata = data.split("=", 1)
             if raw_metadata[0] != "max_link_capacity":
                 raise ParserError(
