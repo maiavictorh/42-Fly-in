@@ -17,7 +17,7 @@ CLEAR = "\33c"
 
 def menu() -> Any:
     maps = {
-        "easy  ": {
+        "easy": {
             "1": "maps/easy/01_linear_path.txt",
             "2": "maps/easy/02_simple_fork.txt",
             "3": "maps/easy/03_basic_capacity.txt"
@@ -27,7 +27,7 @@ def menu() -> Any:
             "2": "maps/medium/02_circular_loop.txt",
             "3": "maps/medium/03_priority_puzzle.txt"
         },
-        "hard  ": {
+        "hard": {
             "1": "maps/hard/01_maze_nightmare.txt",
             "2": "maps/hard/02_capacity_hell.txt",
             "3": "maps/hard/03_ultimate_challenge.txt"
@@ -39,10 +39,10 @@ def menu() -> Any:
 
     while True:
         print(CLEAR)
-        print(f"  {PURPLE}┌──────────────────────────┐")
-        print(f"  │          {IT}Fly-in{NC}          {PURPLE}│")
-        print(f"  {PURPLE}└──────────────────────────┘{NC}")
-        print("   Choose difficulty\n"
+        print(f" {PURPLE}┌──────────────────────────┐")
+        print(f" │          {IT}Fly-in{NC}          {PURPLE}│")
+        print(f" {PURPLE}└──────────────────────────┘{NC}")
+        print(f"   {BOLD}{GREEN}Choose difficulty:{NC}\n"
               "    1. Easy\n"
               "    2. Medium\n"
               "    3. Hard\n"
@@ -66,25 +66,25 @@ def menu() -> Any:
             sleep(2)
             continue
 
-        difficulty = {"1": "easy  ", "2": "medium", "3": "hard  "}[choice]
+        difficulty = {"1": "easy", "2": "medium", "3": "hard"}[choice]
         labels = {
-            "easy  ": (GREEN, ["Linear_path.txt",
-                               "Simple_fork.txt",
-                               "Basic_capacity.txt"]),
+            "easy": (GREEN, ["Linear_path.txt",
+                             "Simple_fork.txt",
+                             "Basic_capacity.txt"]),
             "medium": (YELLOW, ["Dead_end_trap.txt",
                                 "Circular_loop.txt",
                                 "Priority_puzzle.txt"]),
-            "hard  ": (RED, ["Maze_nightmare.txt",
-                             "Capacity_hell.txt",
-                             "Ultimate_challenge.txt"]),
+            "hard": (RED, ["Maze_nightmare.txt",
+                           "Capacity_hell.txt",
+                           "Ultimate_challenge.txt"]),
         }
         color, files = labels[difficulty]
 
         print(CLEAR)
-        print(f"   {PURPLE}┌──────────────┐")
-        print(f"   │    {color}{BOLD}{difficulty.capitalize()}"
-              f" {NC}{PURPLE}   │")
-        print(f"   {PURPLE}└──────────────┘{NC}")
+        print(f" {PURPLE}┌──────────────────────────┐")
+        print(f" │          {IT}Fly-in{NC}          {PURPLE}│")
+        print(f" {PURPLE}└──────────────────────────┘{NC}")
+        print(f"   {BOLD}{color}{difficulty.capitalize()}:{NC}")
         for i, f in enumerate(files, start=1):
             print(f"    {i}. {f}")
 
