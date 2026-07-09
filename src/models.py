@@ -1,9 +1,5 @@
 from typing import Optional, Any
-
-
-class Graph:
-    def __init__(self) -> None:
-        pass
+from .utils import ZoneType
 
 
 class Drone:
@@ -17,6 +13,22 @@ class Hub:
         self.name = name
         self.coord = coord
         self.metadata = metadata
+        self.zone = ZoneType.NORMAL.value
+        self.color = None
+        self.max_drones = 1
+        self._define_metadata(self.metadata)
+
+    def _define_metadata(self, metadata: dict[str, Any] | None) -> None:
+
+        if metadata is None:
+            return
+
+        if "zone" in metadata.keys():
+            self.zone = metadata["zone"]
+        if "color" in metadata.keys():
+            self.color = metadata["color"]
+        if "max_drones" in metadata.keys():
+            self.max_drones = metadata["max_drones"]
 
 
 class Connection:

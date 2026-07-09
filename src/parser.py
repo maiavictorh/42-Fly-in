@@ -1,5 +1,6 @@
 from .utils import Processor, ParserError
 from .models import Hub, Connection
+from .Graph import Graph
 
 
 class Parser(Processor):
@@ -11,7 +12,7 @@ class Parser(Processor):
         self.hubs: list[Hub] = []
         self.connections: list[Connection] = []
 
-    def parse(self) -> None:
+    def parse(self) -> Graph:
         with open(self.file_name, "r") as file:
 
             for line_index, line in enumerate(start=1, iterable=file):
@@ -58,6 +59,9 @@ class Parser(Processor):
             raise ParserError("Missing start_hub directive")
         if self.end_hub is None:
             raise ParserError("Missing end_hub directive")
+
+        return Graph(self.nb_drones, self.start_hub,
+                     self.end_hub, self.hubs, self.connections)
 
     def _handle_line(self, line: str, line_index: int) -> None:
         key, value = line.split(":", 1)

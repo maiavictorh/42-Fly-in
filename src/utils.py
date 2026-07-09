@@ -42,8 +42,10 @@ class Processor:
     @staticmethod
     def process_str(value: str, line_index: int) -> str:
         new_value = value.strip()
+
         if len(new_value) == 0:
             raise ParserError(f"Empty input in line: {line_index}")
+
         return new_value
 
     def process_metadata(self, value: str, line_index: int) -> dict[str, Any]:
