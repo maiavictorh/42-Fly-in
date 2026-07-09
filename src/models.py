@@ -18,9 +18,6 @@ class Hub:
         self.coord = coord
         self.metadata = metadata
 
-    # @staticmethod
-    # def validate_metadata
-
 
 class Connection:
     def __init__(self, hub_1: str, hub_2: str,

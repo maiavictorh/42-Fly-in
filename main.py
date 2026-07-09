@@ -112,9 +112,6 @@ def main() -> None:
         print(PURPLE, "\n===== Initiating primary Test =====\n", NC)
 
         # =================== TEST =================== #
-        # print(f"{map}\n")
-        # print("nb_drones:", parser.nb_drones)
-
         print("\nHubs:")
         for h in parser.hubs:
             print(f"  name: {h.name} | coord: {h.coord} "

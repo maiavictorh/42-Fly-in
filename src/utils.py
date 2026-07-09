@@ -13,6 +13,14 @@ class ZoneType(Enum):
     PRIORITY = "priority"
 
 
+class Color(Enum):
+    GREEN = "green"
+    YELLOW = "yellow"
+    RED = "red"
+    BLUE = "blue"
+    GRAY = "gray"
+
+
 class Processor:
     def __init__(self) -> None:
         pass
@@ -42,6 +50,8 @@ class Processor:
         raw_data = value.split(" ")
         data: dict[str, Any] = {}
         valid_metadata = ["zone", "color", "max_drones"]
+        valid_zones = [zone.value for zone in ZoneType]
+        valid_color = [color.value for color in Color]
 
         if "[" not in value or "]" not in value:
             raise ParserError(
@@ -49,12 +59,23 @@ class Processor:
 
         for raw in raw_data:
             raw = raw.strip("[]")
+
             if "=" not in raw:
                 raise ParserError(f"Invalid metadata in line: {line_index}")
+
             d = raw.split("=", 1)
+
             if d[0] not in valid_metadata:
                 raise ParserError(
                     f"Invalid metadata value in line: {line_index}")
+            if d[0] == "zone":
+                if d[1] not in valid_zones:
+                    raise ParserError(
+                        f"Invalid metadata zone in line: {line_index}")
+            if d[0] == "color":
+                if d[1] not in valid_color:
+                    raise ParserError(
+                        f"Invalid metadata color in line: {line_index}")
             if d[0] == "max_drones":
                 data[d[0]] = self.process_int(d[1], line_index)
                 if data[d[0]] < 1:
