@@ -33,7 +33,15 @@ class Hub:
 
 class Connection:
     def __init__(self, hub_1: str, hub_2: str,
-                 metadata: Optional[dict[str, Any]] = None) -> None:
+                 metadata: Optional[dict[str, int]] = None) -> None:
         self.hub_1 = hub_1
         self.hub_2 = hub_2
         self.metadata = metadata
+        self.max_link_capacity = self._define_metadata(self.metadata)
+
+    def _define_metadata(self, metadata: dict[str, int] | None) -> int:
+
+        if metadata is not None:
+            if "max_link_capacity" in metadata.keys():
+                return metadata["max_link_capacity"]
+        return 1

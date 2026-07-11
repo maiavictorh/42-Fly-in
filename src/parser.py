@@ -1,6 +1,6 @@
 from .utils import Processor, ParserError
 from .models import Hub, Connection
-from .Graph import Graph
+from .graph import Graph
 
 
 class Parser(Processor):
@@ -71,7 +71,7 @@ class Parser(Processor):
             "nb_drones": self._parse_nb_drones,
             "start_hub": self._parse_start_hub,
             "end_hub": self._parse_end_hub,
-            "hub": self._parse_hub,
+            "hub": self._create_hub,
             "connection": self._parse_connection
         }
 
@@ -108,10 +108,6 @@ class Parser(Processor):
             raise ParserError(f"Duplicated end hub in line: {line_index}")
 
         self.end_hub = self._create_hub(value, line_index)
-
-    def _parse_hub(self, value: str, line_index: int) -> None:
-
-        self._create_hub(value, line_index)
 
     def _create_hub(self, value: str, line_index: int) -> Hub:
 

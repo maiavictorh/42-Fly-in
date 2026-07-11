@@ -19,6 +19,19 @@ class Color(Enum):
     RED = "red"
     BLUE = "blue"
     GRAY = "gray"
+    ORANGE = "orange"
+    CYAN = "cyan"
+    PURPLE = "purple"
+    BROWN = "brown"
+    LIME = "lime"
+    MAGENTA = "magenta"
+    GOLD = "gold"
+    BLACK = "black"
+    MAROON = "maroon"
+    DARKRED = "darkred"
+    VIOLET = "violet"
+    CRIMSON = "crimson"
+    RAINBOW = "rainbow"
 
 
 class Processor:

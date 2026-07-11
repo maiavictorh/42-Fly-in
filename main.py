@@ -113,17 +113,15 @@ def main() -> None:
 
         # =================== TEST =================== #
         print("\nHubs:")
-        for h in parser.hubs:
+        for h in graph.hubs:
             print(f"  name: {h.name} | coord: {h.coord} "
-                  f"| metadata: {h.zone, h.color, h.max_drones}")
+                  f"| zone: {h.zone}, color: {h.color}, "
+                  f"max_drones: {h.max_drones}")
 
         print("\nConnections:")
-        for co in parser.connections:
-            print(f"  hub_1: {co.hub_1} | hub_2: {co.hub_2} "
-                  f"| metadata: {co.metadata}")
-        print()
-        for hub in graph.hubs:
-            print(hub.name)
+        for c in graph.connections:
+            print(f"  hub_1: {c.hub_1} | hub_2: {c.hub_2} "
+                  f"| max_link_capacity: {c.max_link_capacity}")
         # ============================================ #
 
     except ParserError as err:
