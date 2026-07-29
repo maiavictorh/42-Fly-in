@@ -112,16 +112,22 @@ def main() -> None:
         print(PURPLE, "\n===== Initiating primary Test =====\n", NC)
 
         # =================== TEST =================== #
+        print("Number of drones:", graph.nb_drones)
         print("\nHubs:")
         for h in graph.hubs:
             print(f"  name: {h.name} | coord: {h.coord} "
-                  f"| zone: {h.zone}, color: {h.color}, "
+                  f"| zone: {h.zone.value}, color: "
+                  f"{h.color.value if h.color is not None else "none"}, "
                   f"max_drones: {h.max_drones}")
 
         print("\nConnections:")
         for c in graph.connections:
             print(f"  hub_1: {c.hub_1} | hub_2: {c.hub_2} "
                   f"| max_link_capacity: {c.max_link_capacity}")
+
+        print("\nDrones:")
+        for d in graph.drones:
+            print(f" {d.id}", end="")
         # ============================================ #
 
     except ParserError as err:

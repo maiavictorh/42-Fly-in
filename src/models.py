@@ -1,10 +1,5 @@
 from typing import Optional, Any
-from .utils import ZoneType
-
-
-class Drone:
-    def __init__(self) -> None:
-        pass
+from .utils import ZoneType, Color, DroneStatus
 
 
 class Hub:
@@ -13,8 +8,8 @@ class Hub:
         self.name = name
         self.coord = coord
         self.metadata = metadata
-        self.zone = ZoneType.NORMAL.value
-        self.color = None
+        self.zone = ZoneType.NORMAL
+        self.color: Optional[Color] = None
         self.max_drones = 1
         self._define_metadata(self.metadata)
 
@@ -24,9 +19,13 @@ class Hub:
             return
 
         if "zone" in metadata.keys():
-            self.zone = metadata["zone"]
+            for zone in ZoneType:
+                if zone.value == metadata["zone"]:
+                    self.zone = zone
         if "color" in metadata.keys():
-            self.color = metadata["color"]
+            for color in Color:
+                if color.value == metadata["color"]:
+                    self.color = color
         if "max_drones" in metadata.keys():
             self.max_drones = metadata["max_drones"]
 
@@ -45,3 +44,10 @@ class Connection:
             if "max_link_capacity" in metadata.keys():
                 return metadata["max_link_capacity"]
         return 1
+
+
+class Drone:
+    def __init__(self, id: str, start_hub: Hub) -> None:
+        self.id = id
+        self.current_hub: Optional[Hub] = start_hub
+        self.status = DroneStatus.WAITING

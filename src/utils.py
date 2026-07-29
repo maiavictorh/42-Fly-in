@@ -34,6 +34,12 @@ class Color(Enum):
     RAINBOW = "rainbow"
 
 
+class DroneStatus(Enum):
+    WAITING = "waiting"
+    IN_TRANSIT = "in_transit"
+    DELIVERED = "delivered"
+
+
 class Processor:
     def __init__(self) -> None:
         pass
@@ -66,7 +72,6 @@ class Processor:
         data: dict[str, Any] = {}
         valid_metadata = ["zone", "color", "max_drones"]
         valid_zones = [zone.value for zone in ZoneType]
-        valid_color = [color.value for color in Color]
 
         if "[" not in value or "]" not in value:
             raise ParserError(
@@ -88,7 +93,7 @@ class Processor:
                     raise ParserError(
                         f"Invalid metadata zone in line: {line_index}")
             if d[0] == "color":
-                if d[1] not in valid_color:
+                if not d[1].isalpha():
                     raise ParserError(
                         f"Invalid metadata color in line: {line_index}")
             if d[0] == "max_drones":
