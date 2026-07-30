@@ -1,5 +1,5 @@
 from typing import Optional, Any
-from .utils import ZoneType, Color, DroneStatus
+from .utils import ZoneType, Color
 
 
 class Hub:
@@ -44,10 +44,3 @@ class Connection:
             if "max_link_capacity" in metadata.keys():
                 return metadata["max_link_capacity"]
         return 1
-
-
-class Drone:
-    def __init__(self, id: str, start_hub: Hub) -> None:
-        self.id = id
-        self.current_hub: Optional[Hub] = start_hub
-        self.status = DroneStatus.WAITING

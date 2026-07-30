@@ -127,7 +127,7 @@ def main() -> None:
 
         print("\nDrones:")
         for d in graph.drones:
-            print(f" {d.id}", end="")
+            print(f" D{d.id}", end="")
         # ============================================ #
 
     except ParserError as err:
