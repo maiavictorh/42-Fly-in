@@ -1,5 +1,16 @@
 from typing import Optional, Any
-from .utils import ZoneType, Color
+from .utils import DroneStatus, ZoneType, Color
+
+
+class Drone:
+    def __init__(self, id: int, start_hub: "Hub") -> None:
+        self.id = id
+        self.status = DroneStatus.WAITING
+        self.path: list[Hub] = []
+        self.path_index = 0
+        self.turns_remaining = 0
+        self.current_hub: Optional[Hub] = start_hub
+        self.current_connection: Optional[Connection] = None
 
 
 class Hub:
@@ -31,7 +42,7 @@ class Hub:
 
 
 class Connection:
-    def __init__(self, hub_1: str, hub_2: str,
+    def __init__(self, hub_1: Hub, hub_2: Hub,
                  metadata: Optional[dict[str, int]] = None) -> None:
         self.hub_1 = hub_1
         self.hub_2 = hub_2

@@ -4,12 +4,13 @@ from .graph import Graph
 
 
 class Parser(Processor):
-    def __init__(self, file_name: str):
+    def __init__(self, file_name: str) -> None:
+        super().__init__()
         self.file_name = file_name
         self.nb_drones: int | None = None
         self.start_hub: Hub | None = None
         self.end_hub: Hub | None = None
-        self.hubs: list[Hub] = []
+        self.hubs: dict[str, Hub] = {}
         self.connections: list[Connection] = []
 
     def parse(self) -> Graph:
@@ -28,24 +29,14 @@ class Parser(Processor):
 
                 hub_names = []
                 hub_coords = []
-                for hub in self.hubs:
+                for hub in self.hubs.values():
                     hub_names.append(hub.name)
                     if hub.coord in hub_coords:
                         raise ParserError("Duplicated coordinates for hub "
                                           f"in line: {line_index}")
                     hub_coords.append(hub.coord)
 
-                for connection in self.connections:
-                    if connection.hub_1 not in hub_names:
-                        raise ParserError(
-                            "Invalid connection (First hub "
-                            f"not defined) in line: {line_index}")
-                    if connection.hub_2 not in hub_names:
-                        raise ParserError(
-                            "Invalid connection (Second hub "
-                            f"not defined) in line: {line_index}")
-
-                checked_pairs: set[frozenset[str]] = set()
+                checked_pairs: set[frozenset[Hub | None]] = set()
                 for connection in self.connections:
                     conn_pair = frozenset((connection.hub_1, connection.hub_2))
                     if conn_pair in checked_pairs:
@@ -130,7 +121,7 @@ class Parser(Processor):
                 raise ParserError(
                     f"Invalid character for hub name in line: {line_index}")
 
-        for h in self.hubs:
+        for h in self.hubs.values():
             if name == h.name:
                 raise ParserError(f"Duplicated hub name in line: {line_index}")
 
@@ -145,7 +136,7 @@ class Parser(Processor):
         else:
             hub = Hub(name, (x, y))
 
-        self.hubs.append(hub)
+        self.hubs[hub.name] = hub
         return hub
 
     def _parse_connection(self, value: str, line_index: int) -> None:
@@ -177,12 +168,12 @@ class Parser(Processor):
             raise ParserError(
                 f"Invalid connection syntax in line: {line_index}")
 
-        if "-" in hubs[0] or "-" in hubs[1]:
-            raise ParserError(f"Invalid connection name in line: {line_index}")
-
         if hubs[0] == hubs[1]:
             raise ParserError("Invalid connection (same hub on both ends)"
                               f" in line: {line_index}")
+        if hubs[0] not in self.hubs or hubs[1] not in self.hubs:
+            raise ParserError(
+                f"Connection references undefined hub in line: {line_index}")
 
         if data is not None:
             if "=" not in data:
@@ -198,8 +189,8 @@ class Parser(Processor):
                     f"Invalid metadata value in line: {line_index}")
 
             self.connections.append(
-                Connection(hubs[0], hubs[1], metadata))
+                Connection(self.hubs[hubs[0]], self.hubs[hubs[1]], metadata))
 
         else:
             self.connections.append(
-                Connection(hubs[0], hubs[1]))
+                Connection(self.hubs[hubs[0]], self.hubs[hubs[1]]))

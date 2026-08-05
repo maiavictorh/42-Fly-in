@@ -1,6 +1,6 @@
 from .graph import Graph
-from .models import Hub
-from .drone import Drone, DroneStatus
+# from .models import Hub, Drone
+# from .utils import DroneStatus
 
 
 class Simulator:
@@ -13,7 +13,6 @@ class Simulator:
     def move(self) -> None:
         ...
 
-    def can_move(self, drone: Drone, next_hub: Hub) -> bool:
+    def can_move(self) -> bool:
 
-        return (drone.status != DroneStatus.DELIVERED
-                and drone.path[drone.path_index + 1])
+        return False

@@ -3,4 +3,4 @@ from .utils import ParserError
 from .graph import Graph
 
 
-__all__ = ["parser", "ParserError", "graph"]
+__all__ = ["Parser", "ParserError", "Graph"]

@@ -23,6 +23,8 @@ debug:
 
 clean:
 	$(RM) .mypy_cache
+	$(RM) .idea
+	$(RM) .vscode
 	find . -type d -name "__pycache__" -exec rm -rf {} +
 
 fclean: clean

@@ -1,11 +1,12 @@
 from .models import Hub, Connection, Drone
+from .utils import ZoneType
 
 
 class Graph:
     def __init__(self, nb_drones: int,
                  start_hub: Hub,
                  end_hub: Hub,
-                 hubs: list[Hub],
+                 hubs: dict[str, Hub],
                  connections: list[Connection]) -> None:
         self.nb_drones = nb_drones
         self.start_hub = start_hub
@@ -20,3 +21,25 @@ class Graph:
             drone_list.append(Drone(i, self.start_hub))
 
         return drone_list
+
+    def find_path(self) -> list[Hub]:
+        adjacency = self._build_adjacency()
+        print(adjacency)
+
+    def _build_adjacency(self) -> dict[Hub, list[tuple[Hub, int]]]:
+        adjacency: dict[Hub, list[tuple[Hub, int]]] = \
+            {h: [] for h in self.hubs.values()}
+
+        for conn in self.connections:
+            weight = self._connection_weight(conn)
+            adjacency[conn.hub_1].append((conn.hub_2, weight))
+            adjacency[conn.hub_2].append((conn.hub_1, weight))
+
+        return adjacency
+
+    @staticmethod
+    def _connection_weight(conn: Connection) -> int:
+        if conn.hub_1.zone == ZoneType.RESTRICTED \
+           or conn.hub_2.zone == ZoneType.RESTRICTED:
+            return 2
+        return 1

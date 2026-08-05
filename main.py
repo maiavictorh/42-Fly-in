@@ -109,12 +109,11 @@ def main() -> None:
         graph = parser.parse()
 
         print(CLEAR)
-        print(PURPLE, "\n===== Initiating primary Test =====\n", NC)
 
         # =================== TEST =================== #
         print("Number of drones:", graph.nb_drones)
         print("\nHubs:")
-        for h in graph.hubs:
+        for h in graph.hubs.values():
             print(f"  name: {h.name} | coord: {h.coord} "
                   f"| zone: {h.zone.value}, color: "
                   f"{h.color.value if h.color is not None else "none"}, "
@@ -122,20 +121,20 @@ def main() -> None:
 
         print("\nConnections:")
         for c in graph.connections:
-            print(f"  hub_1: {c.hub_1} | hub_2: {c.hub_2} "
-                  f"| max_link_capacity: {c.max_link_capacity}")
+            print("  ", end="")
+            print(f"hub_1: {c.hub_1.name if c.hub_1 is not None else "none"} "
+                  f"| hub_2: {c.hub_2.name if c.hub_2 is not None else "none"}"
+                  f" | max_link_capacity: {c.max_link_capacity}")
 
         print("\nDrones:")
         for d in graph.drones:
             print(f" D{d.id}", end="")
+        print()
         # ============================================ #
 
     except ParserError as err:
         print(f"{RED}Error: {err}\n  {EXIT}Aborting...  {NC}")
         exit(1)
-
-    else:
-        print(GREEN, "\n=== Program tested successfully! ===\n", NC)
 
 
 if __name__ == "__main__":
