@@ -8,7 +8,16 @@ class Simulator:
         self.graph = graph
 
     def run(self) -> None:
-        ...
+
+        for d in self.graph.drones:
+            d.path = self.graph.find_path()
+
+            # ========= TEST ========= #
+            print(f"Drone {d.id}:", end=" ")
+            for h in d.path:
+                print(h.name, end=" ")
+            print("\n")
+            # ======================== #
 
     def move(self) -> None:
         ...

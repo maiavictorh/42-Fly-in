@@ -23,19 +23,20 @@ class Graph:
         return drone_list
 
     def find_path(self) -> list[Hub]:
-        adjacency = self._build_adjacency()
-        print(adjacency)
+        path = self._build_path()
 
-    def _build_adjacency(self) -> dict[Hub, list[tuple[Hub, int]]]:
-        adjacency: dict[Hub, list[tuple[Hub, int]]] = \
+        return path
+
+    def _build_path(self) -> dict[Hub, list[tuple[Hub, int]]]:
+        path: dict[Hub, list[tuple[Hub, int]]] = \
             {h: [] for h in self.hubs.values()}
 
         for conn in self.connections:
             weight = self._connection_weight(conn)
-            adjacency[conn.hub_1].append((conn.hub_2, weight))
-            adjacency[conn.hub_2].append((conn.hub_1, weight))
+            path[conn.hub_1].append((conn.hub_2, weight))
+            path[conn.hub_2].append((conn.hub_1, weight))
 
-        return adjacency
+        return path
 
     @staticmethod
     def _connection_weight(conn: Connection) -> int:

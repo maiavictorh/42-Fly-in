@@ -1,5 +1,5 @@
 from sys import exit
-from src import Parser, ParserError
+from src import Parser, ParserError, Simulator
 from time import sleep
 from typing import Any
 
@@ -110,20 +110,23 @@ def main() -> None:
 
         print(CLEAR)
 
+        simulator = Simulator(graph)
+        simulator.run()
+
         # =================== TEST =================== #
         print("Number of drones:", graph.nb_drones)
         print("\nHubs:")
         for h in graph.hubs.values():
             print(f"  name: {h.name} | coord: {h.coord} "
                   f"| zone: {h.zone.value}, color: "
-                  f"{h.color.value if h.color is not None else "none"}, "
+                  f"{h.color.value if h.color is not None else 'none'}, "
                   f"max_drones: {h.max_drones}")
 
         print("\nConnections:")
         for c in graph.connections:
             print("  ", end="")
-            print(f"hub_1: {c.hub_1.name if c.hub_1 is not None else "none"} "
-                  f"| hub_2: {c.hub_2.name if c.hub_2 is not None else "none"}"
+            print(f"hub_1: {c.hub_1.name if c.hub_1 is not None else 'none'} "
+                  f"| hub_2: {c.hub_2.name if c.hub_2 is not None else 'none'}"
                   f" | max_link_capacity: {c.max_link_capacity}")
 
         print("\nDrones:")
