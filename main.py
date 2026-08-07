@@ -128,10 +128,8 @@ def main() -> None:
         # print("\nConnections:")
         # for c in graph.connections:
         #     print("  ", end="")
-        #     print("hub_1:",
-        #           c.hub_1.name if c.hub_1 is not None else 'none',
-        #           "| hub_2:",
-        #           c.hub_2.name if c.hub_2 is not None else 'none',
+        #     print("hub_1:", c.hub_1.name if c.hub_1 else 'none',
+        #           "| hub_2:", c.hub_2.name if c.hub_2 else 'none',
         #           f"| max_link_capacity: {c.max_link_capacity}")
         # ============================================ #
 

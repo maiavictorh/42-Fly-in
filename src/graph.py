@@ -26,11 +26,24 @@ class Graph:
         adjacency = self._build_adjacency()
         path: list[Hub] = []
 
-        for k, v in adjacency.items():
-            print(f"{k} -> {v}")
-        print()
+        self.dijkstra(self.start_hub, self.end_hub, adjacency)
+
+        # for k, v in adjacency.items():
+        #     print(f"{k} -> {v}")
+        # print()
 
         return path
+
+    def dijkstra(self, start: Hub, end: Hub,
+                 adjacency: dict[Hub, list[tuple[Hub, int]]]):
+
+        distances = {hub: float("inf") for hub in adjacency}
+        distances[start] = 0
+        previous = {hub: None for hub in adjacency}
+
+        print(distances)
+        print(previous)
+        print()
 
     def _build_adjacency(self) -> dict[Hub, list[tuple[Hub, int]]]:
         adjacency: dict[Hub, list[tuple[Hub, int]]] = \

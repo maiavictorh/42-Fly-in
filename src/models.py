@@ -25,7 +25,7 @@ class Hub:
         self._define_metadata(self.metadata)
 
     def __repr__(self) -> str:
-        return f"{self.name}"
+        return f"H-{self.name}"
 
     def _define_metadata(self, metadata: dict[str, Any] | None) -> None:
 
