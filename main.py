@@ -114,25 +114,25 @@ def main() -> None:
         simulator.run()
 
         # =================== TEST =================== #
-        print("Number of drones:", graph.nb_drones)
-        print("\nHubs:")
-        for h in graph.hubs.values():
-            print(f"  name: {h.name} | coord: {h.coord} "
-                  f"| zone: {h.zone.value}, color: "
-                  f"{h.color.value if h.color is not None else 'none'}, "
-                  f"max_drones: {h.max_drones}")
+        # print("\nDrones:")
+        # for d in graph.drones:
+        #     print(f" D{d.id}", end="")
 
-        print("\nConnections:")
-        for c in graph.connections:
-            print("  ", end="")
-            print(f"hub_1: {c.hub_1.name if c.hub_1 is not None else 'none'} "
-                  f"| hub_2: {c.hub_2.name if c.hub_2 is not None else 'none'}"
-                  f" | max_link_capacity: {c.max_link_capacity}")
+        # print("\n\nHubs:")
+        # for h in graph.hubs.values():
+        #     print(f"  name: {h.name} | coord: {h.coord} "
+        #           f"| zone: {h.zone.value}, color: "
+        #           f"{h.color.value if h.color is not None else 'none'}, "
+        #           f"max_drones: {h.max_drones}")
 
-        print("\nDrones:")
-        for d in graph.drones:
-            print(f" D{d.id}", end="")
-        print()
+        # print("\nConnections:")
+        # for c in graph.connections:
+        #     print("  ", end="")
+        #     print("hub_1:",
+        #           c.hub_1.name if c.hub_1 is not None else 'none',
+        #           "| hub_2:",
+        #           c.hub_2.name if c.hub_2 is not None else 'none',
+        #           f"| max_link_capacity: {c.max_link_capacity}")
         # ============================================ #
 
     except ParserError as err:

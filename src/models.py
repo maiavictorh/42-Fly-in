@@ -24,6 +24,9 @@ class Hub:
         self.max_drones = 1
         self._define_metadata(self.metadata)
 
+    def __repr__(self) -> str:
+        return f"{self.name}"
+
     def _define_metadata(self, metadata: dict[str, Any] | None) -> None:
 
         if metadata is None:
