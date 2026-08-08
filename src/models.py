@@ -12,6 +12,9 @@ class Drone:
         self.current_hub: Optional[Hub] = start_hub
         self.current_connection: Optional[Connection] = None
 
+    def __repr__(self) -> str:
+        return f"D{self.id}"
+
 
 class Hub:
     def __init__(self, name: str, coord: tuple[int, int],
@@ -25,7 +28,7 @@ class Hub:
         self._define_metadata(self.metadata)
 
     def __repr__(self) -> str:
-        return f"H-{self.name}"
+        return f"{self.name}"
 
     def _define_metadata(self, metadata: dict[str, Any] | None) -> None:
 

@@ -1,3 +1,4 @@
+from typing import Optional
 from heapq import heappop, heappush
 from .models import Hub, Connection, Drone
 from .utils import ZoneType
@@ -24,23 +25,33 @@ class Graph:
         return drone_list
 
     def find_path(self) -> list[Hub]:
-        adjacency = self._build_adjacency()
         path: list[Hub] = []
 
-        self.dijkstra(self.start_hub, self.end_hub, adjacency)
+        adjacency = self._build_adjacency()
+        previous_dict = self.dijkstra(self.start_hub, self.end_hub, adjacency)
 
-        # for k, v in adjacency.items():
-        #     print(f"{k} -> {v}")
-        # print()
+        if self.end_hub == self.start_hub:
+            return [self.start_hub]
+        if previous_dict[self.end_hub] is None:
+            return []
 
-        return path
+        path.append(self.end_hub)
+        current = previous_dict[self.end_hub]
 
-    def dijkstra(self, start: Hub, end: Hub,
-                 adjacency: dict[Hub, list[tuple[Hub, int]]]):
+        while current is not None:
+            path.append(current)
+            current = previous_dict[current]
+
+        return list(reversed(path))
+
+    def dijkstra(
+            self, start: Hub, end: Hub,
+            adjacency: dict[Hub, list[tuple[Hub, int]]]
+            ) -> dict[Hub, Optional[Hub]]:
 
         distances = {hub: float("inf") for hub in adjacency}
         distances[start] = 0
-        previous = {hub: None for hub in adjacency}
+        previous: dict[Hub, Optional[Hub]] = {hub: None for hub in adjacency}
         visited: set[Hub] = set()
         count = 0
 
@@ -67,10 +78,6 @@ class Graph:
                     count += 1
                     heappush(heap, (new_distance, count, neighbor))
 
-                # print(distances)
-                # print(previous)
-                print(heap)
-
         return previous
 
     def _build_adjacency(self) -> dict[Hub, list[tuple[Hub, int]]]:
@@ -78,15 +85,9 @@ class Graph:
             {h: [] for h in self.hubs.values()}
 
         for conn in self.connections:
-            weight = self._connection_weight(conn)
+            weight = 2 if conn.hub_1.zone == ZoneType.RESTRICTED \
+                        or conn.hub_2.zone == ZoneType.RESTRICTED else 1
             adjacency[conn.hub_1].append((conn.hub_2, weight))
             adjacency[conn.hub_2].append((conn.hub_1, weight))
 
         return adjacency
-
-    @staticmethod
-    def _connection_weight(conn: Connection) -> int:
-        if conn.hub_1.zone == ZoneType.RESTRICTED \
-           or conn.hub_2.zone == ZoneType.RESTRICTED:
-            return 2
-        return 1

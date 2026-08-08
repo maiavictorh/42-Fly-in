@@ -11,13 +11,10 @@ class Simulator:
 
         for d in self.graph.drones:
             d.path = self.graph.find_path()
+            if not d.path:
+                return
 
-            # # ========= TEST ========= #
-            # print(f"Drone {d.id}:", end=" ")
-            # for h in d.path:
-            #     print(h.name, end=" ")
-            # print("\n")
-            # # ======================== #
+        print(f"{self.graph.drones[0]}: {self.graph.drones[0].path}")
 
     def move(self) -> None:
         ...

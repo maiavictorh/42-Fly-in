@@ -33,6 +33,7 @@ fclean: clean
 re: fclean install run
 
 lint:
+	clear
 	$(FLAKE8) . --exclude $(VENV)
 	$(MYPY) . \
 		--warn-return-any \
@@ -42,6 +43,7 @@ lint:
 		--check-untyped-defs
 
 lint-strict:
+	clear
 	$(FLAKE8) . --exclude $(VENV)
 	$(MYPY) . --strict
 
