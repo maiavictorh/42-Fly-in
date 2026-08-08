@@ -1,3 +1,4 @@
+from heapq import heappop, heappush
 from .models import Hub, Connection, Drone
 from .utils import ZoneType
 
@@ -40,10 +41,37 @@ class Graph:
         distances = {hub: float("inf") for hub in adjacency}
         distances[start] = 0
         previous = {hub: None for hub in adjacency}
+        visited: set[Hub] = set()
+        count = 0
 
-        print(distances)
-        print(previous)
-        print()
+        heap: list[tuple[float, int, Hub]] = [(0, count, start)]
+
+        while heap:
+            current_distance, _, current_hub = heappop(heap)
+
+            if current_hub in visited:
+                continue
+            visited.add(current_hub)
+
+            if current_hub == end:
+                break
+
+            for neighbor, weight in adjacency[current_hub]:
+
+                new_distance = current_distance + weight
+
+                if new_distance < distances[neighbor]:
+                    distances[neighbor] = new_distance
+                    previous[neighbor] = current_hub
+
+                    count += 1
+                    heappush(heap, (new_distance, count, neighbor))
+
+                # print(distances)
+                # print(previous)
+                print(heap)
+
+        return previous
 
     def _build_adjacency(self) -> dict[Hub, list[tuple[Hub, int]]]:
         adjacency: dict[Hub, list[tuple[Hub, int]]] = \
