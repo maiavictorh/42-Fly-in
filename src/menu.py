@@ -4,7 +4,7 @@ from typing import Any
 
 
 class Menu:
-    def __init__(self):
+    def __init__(self) -> None:
         pass
 
     @staticmethod
@@ -46,11 +46,11 @@ class Menu:
             print(f" │          {IT}Fly-in{NC}          {PURPLE}│")
             print(f" {PURPLE}└──────────────────────────┘{NC}")
             print(f"   {BOLD}{GREEN}Choose difficulty:{NC}\n"
-                "    1. Easy\n"
-                "    2. Medium\n"
-                "    3. Hard\n"
-                "    4. Challenger\n"
-                "    5. Custom")
+                  "    1. Easy\n"
+                  "    2. Medium\n"
+                  "    3. Hard\n"
+                  "    4. Challenger\n"
+                  "    5. Custom")
 
             choice = input("\n   Choice: (1-5) or Quit: ")
 
@@ -72,14 +72,14 @@ class Menu:
             difficulty = {"1": "easy", "2": "medium", "3": "hard"}[choice]
             labels = {
                 "easy": (GREEN, ["Linear_path.txt",
-                                "Simple_fork.txt",
-                                "Basic_capacity.txt"]),
+                                 "Simple_fork.txt",
+                                 "Basic_capacity.txt"]),
                 "medium": (YELLOW, ["Dead_end_trap.txt",
                                     "Circular_loop.txt",
                                     "Priority_puzzle.txt"]),
                 "hard": (RED, ["Maze_nightmare.txt",
-                            "Capacity_hell.txt",
-                            "Ultimate_challenge.txt"]),
+                               "Capacity_hell.txt",
+                               "Ultimate_challenge.txt"]),
             }
             color, files = labels[difficulty]
 

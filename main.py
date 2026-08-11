@@ -23,7 +23,7 @@ def main() -> None:
 
         # =================== TEST =================== #
         # print("\nDrones:")
-        # for d in graph.drones:
+        # for d in simulator.drones:
         #     print(f" D{d.id}", end="")
 
         # print("\n\nHubs:")

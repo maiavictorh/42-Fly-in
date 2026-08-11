@@ -13,6 +13,12 @@ class ZoneType(Enum):
     PRIORITY = "priority"
 
 
+class DroneStatus(Enum):
+    WAITING = "waiting"
+    IN_TRANSIT = "in_transit"
+    DELIVERED = "delivered"
+
+
 class Color(Enum):
     GREEN = "green"
     YELLOW = "yellow"
@@ -32,12 +38,6 @@ class Color(Enum):
     VIOLET = "violet"
     CRIMSON = "crimson"
     RAINBOW = "rainbow"
-
-
-class DroneStatus(Enum):
-    WAITING = "waiting"
-    IN_TRANSIT = "in_transit"
-    DELIVERED = "delivered"
 
 
 class Processor:

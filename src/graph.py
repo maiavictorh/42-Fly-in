@@ -1,6 +1,6 @@
 from typing import Optional
 from heapq import heappop, heappush
-from .models import Hub, Connection, Drone
+from .models import Hub, Connection
 from .utils import ZoneType
 
 
@@ -12,17 +12,11 @@ class Graph:
                  connections: list[Connection]) -> None:
         self.nb_drones = nb_drones
         self.start_hub = start_hub
+        self.start_hub.max_drones = self.nb_drones
         self.end_hub = end_hub
+        self.end_hub.max_drones = self.nb_drones
         self.hubs = hubs
         self.connections = connections
-        self.drones = self._generate_drones()
-
-    def _generate_drones(self) -> list[Drone]:
-        drone_list = []
-        for i in range(1, self.nb_drones + 1):
-            drone_list.append(Drone(i, self.start_hub))
-
-        return drone_list
 
     def find_path(self) -> list[Hub]:
         path: list[Hub] = []

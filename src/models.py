@@ -55,6 +55,9 @@ class Connection:
         self.metadata = metadata
         self.max_link_capacity = self._define_metadata(self.metadata)
 
+    def __repr__(self) -> str:
+        return f"{self.hub_1} <-> {self.hub_2}"
+
     def _define_metadata(self, metadata: dict[str, int] | None) -> int:
 
         if metadata is not None:
