@@ -25,19 +25,19 @@ class Simulator:
             return
         for d in self.drones:
             d.path = path
-            for hub in d.path:
-                d.turns_remaining += 2 if hub.zone == ZT.RESTRICTED else 1
 
-        while not self._is_delivered():
+        while self._is_delivered():
+            for d in self.drones:
 
-            for drone in self.drones:
-                if drone.path_index == len(drone.path) - 1:
-                    drone.status = DS.DELIVERED
+                if d.status == DS.DELIVERED:
+                    continue
 
-                print(drone, drone.path_index, drone.current_hub)
+                elif d.status == DS.WAITING:
+                    ...
 
-                if self._can_move(drone):
-                    self._move(drone)
+                elif d.status == DS.IN_TRANSIT:
+                    print(f"{d}-{d.current_connection}")
+                
 
     def _is_delivered(self) -> bool:
         for drone in self.drones:
@@ -46,9 +46,7 @@ class Simulator:
         return True
 
     def _move(self, drone: Drone) -> None:
-        drone.path_index += 1
-        drone.current_hub = drone.path[drone.path_index]
-        self.hub_occupancy[drone.current_hub] += 1
+        ...
 
     def _can_move(self, drone: Drone) -> bool:
 
