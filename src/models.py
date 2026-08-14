@@ -26,6 +26,7 @@ class Hub:
         self.color: Optional[Color] = None
         self.max_drones = 1
         self._define_metadata(self.metadata)
+        self.weight = 2 if self.zone == ZoneType.RESTRICTED else 1
 
     def __repr__(self) -> str:
         return f"{self.name}"

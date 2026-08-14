@@ -1,7 +1,7 @@
 from typing import Optional
 from heapq import heappop, heappush
 from .models import Hub, Connection
-from .utils import ZoneType
+# from .utils import ZoneType
 
 
 class Graph:
@@ -79,9 +79,9 @@ class Graph:
             {h: [] for h in self.hubs.values()}
 
         for conn in self.connections:
-            weight = 2 if conn.hub_1.zone == ZoneType.RESTRICTED \
-                        or conn.hub_2.zone == ZoneType.RESTRICTED else 1
-            adjacency[conn.hub_1].append((conn.hub_2, weight))
-            adjacency[conn.hub_2].append((conn.hub_1, weight))
+            # weight = 2 if conn.hub_1.zone == ZoneType.RESTRICTED \
+            #             or conn.hub_2.zone == ZoneType.RESTRICTED else 1
+            adjacency[conn.hub_1].append((conn.hub_2, conn.hub_2.weight))
+            adjacency[conn.hub_2].append((conn.hub_1, conn.hub_1.weight))
 
         return adjacency
