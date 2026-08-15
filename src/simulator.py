@@ -28,36 +28,7 @@ class Simulator:
             d.path = path
 
         while self._is_delivered() is False:
-            for d in self.drones:
-
-                if d.status == DS.IN_TRANSIT:
-                    d.turns_remaining -= 1
-
-                    if d.turns_remaining == 0:
-                        self.connection_occupancy[d.current_connection] -= 1
-                        d.current_connection = None
-                        d.path_index += 1
-                        d.current_hub = d.path[d.path_index]
-                        d.status = DS.WAITING
-
-                        if d.path_index == len(d.path) - 1:
-                            d.status = DS.DELIVERED
-
-                elif d.status == DS.WAITING:
-                    if d.path_index == len(d.path) - 1:
-                        d.status = DS.DELIVERED
-                        continue
-
-                    next_hub = d.path[d.path_index + 1]
-                    connection = self._get_connection(d.current_hub, next_hub)
-
-                    if self._can_move(d, connection, next_hub):
-                        self.hub_occupancy[d.current_hub] -= 1
-                        self.hub_occupancy[next_hub] += 1
-                        self.connection_occupancy[connection] += 1
-                        d.current_connection = connection
-                        d.turns_remaining = next_hub.weight
-                        d.status = DS.IN_TRANSIT
+            ...
 
     def _is_delivered(self) -> bool:
         for drone in self.drones:
@@ -72,7 +43,4 @@ class Simulator:
             if current_hub == conn.hub_1 and next_hub == conn.hub_2 \
                or current_hub == conn.hub_2 and next_hub == conn.hub_1:
                 return conn
-
-    def _can_move(self, drone: Drone,
-                  connection: Connection, next_hub: Hub) -> bool:
-        ...
+        return None
