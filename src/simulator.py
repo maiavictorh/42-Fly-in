@@ -10,7 +10,7 @@ class Simulator:
         self.drones = self._generate_drones()
         self.hub_occupancy = \
             {hub: 0 for hub in self.graph.hubs.values()}
-        self.connection_occupancy = \
+        self.conn_occupancy = \
             {conn: 0 for conn in self.graph.connections}
 
     def _generate_drones(self) -> list[Drone]:
@@ -27,8 +27,12 @@ class Simulator:
         for d in self.drones:
             d.path = path
 
+        turns = 0
+
         while self._is_delivered() is False:
             ...
+
+        print("Turns:", turns)
 
     def _is_delivered(self) -> bool:
         for drone in self.drones:
@@ -44,3 +48,21 @@ class Simulator:
                or current_hub == conn.hub_2 and next_hub == conn.hub_1:
                 return conn
         return None
+
+    def _move_drone(self, drone: Drone) -> None:
+
+        drone.path_index += 1
+
+        if drone.path_index == len(drone.path) - 1:
+            drone.status = DS.DELIVERED
+
+    def _can_move(self, drone: Drone, connection: Connection) -> bool:
+        if drone.status == DS.DELIVERED:
+            return False
+
+        next_hub = drone.path[drone.path_index + 1]
+
+        if self.conn_occupancy[connection] >= connection.max_link_capacity \
+           or self.hub_occupancy[next_hub] >= next_hub.max_drones:
+            return False
+        return True
