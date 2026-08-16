@@ -27,12 +27,36 @@ class Simulator:
         for d in self.drones:
             d.path = path
 
+        print("Path:", self.drones[0].path)
+        print()
+
         turns = 0
 
         while self._is_delivered() is False:
-            ...
+            moves: list[str] = []
 
-        print("Turns:", turns)
+            for drone in self.drones:
+                if drone.status == DS.IN_TRANSIT:
+                    self._finish_move(drone, moves)
+
+            for drone in self.drones:
+                if drone.status == DS.DELIVERED:
+                    continue
+                if drone.status == DS.IN_TRANSIT:
+                    continue
+
+                next_hub = drone.path[drone.path_index + 1]
+                connection = self._get_connection(drone.current_hub, next_hub)
+                if connection is None:
+                    continue
+
+                if self._can_move(drone, connection, next_hub):
+                    self._move(drone, connection, next_hub, moves)
+
+            print(" ".join(moves))
+            turns += 1
+
+        print("\nTurns:", turns)
 
     def _is_delivered(self) -> bool:
         for drone in self.drones:
@@ -49,20 +73,43 @@ class Simulator:
                 return conn
         return None
 
-    def _move_drone(self, drone: Drone) -> None:
+    def _can_move(self, drone: Drone, conn: Connection, next_hub: Hub) -> bool:
 
-        drone.path_index += 1
-
-        if drone.path_index == len(drone.path) - 1:
-            drone.status = DS.DELIVERED
-
-    def _can_move(self, drone: Drone, connection: Connection) -> bool:
-        if drone.status == DS.DELIVERED:
-            return False
-
-        next_hub = drone.path[drone.path_index + 1]
-
-        if self.conn_occupancy[connection] >= connection.max_link_capacity \
+        if drone.status == DS.DELIVERED \
+           or drone.current_connection is not None \
+           or self.conn_occupancy[conn] >= conn.max_link_capacity \
            or self.hub_occupancy[next_hub] >= next_hub.max_drones:
             return False
+
         return True
+
+    def _move(self, drone: Drone, connection: Connection,
+              next_hub: Hub, moves: list[str]) -> None:
+        self.conn_occupancy[connection] += 1
+        self.hub_occupancy[next_hub] += 1
+        self.hub_occupancy[drone.current_hub] -= 1
+        drone.current_connection = connection
+        drone.current_hub = None
+        drone.turns_remaining = next_hub.weight
+        drone.status = DS.IN_TRANSIT
+
+        moves.append(f"{drone}-{connection}")
+
+
+    def _finish_move(self, drone: Drone, moves: list[str]) -> None:
+        drone.turns_remaining -= 1
+
+        if drone.turns_remaining == 0:
+            self.conn_occupancy[drone.current_connection] -= 1
+            drone.current_connection = None
+            drone.path_index += 1
+            drone.current_hub = drone.path[drone.path_index]
+
+            if drone.path_index == len(drone.path) - 1:
+                drone.status = DS.DELIVERED
+            else:
+                drone.status = DS.WAITING
+
+            moves.append(f"{drone}-{drone.current_hub}")
+        else:
+            moves.append(f"{drone}-{drone.current_connection}")            
