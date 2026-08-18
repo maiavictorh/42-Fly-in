@@ -24,11 +24,8 @@ class Simulator:
         path = self.graph.find_path()
         if not path:
             return
-        for d in self.drones:
-            d.path = path
-
-        print("Path:", self.drones[0].path)
-        print()
+        for drone in self.drones:
+            drone.path = path
 
         turns = 0
 
@@ -46,17 +43,19 @@ class Simulator:
                     continue
 
                 next_hub = drone.path[drone.path_index + 1]
-                connection = self._get_connection(drone.current_hub, next_hub)
+                if drone.current_hub is not None:
+                    connection = self._get_connection(drone.current_hub,
+                                                      next_hub)
                 if connection is None:
                     continue
 
                 if self._can_move(drone, connection, next_hub):
                     self._move(drone, connection, next_hub, moves)
 
-            print(" ".join(moves))
+            print("  ", " ".join(moves))
             turns += 1
 
-        print("\nTurns:", turns)
+        print("\n   Turns:", turns)
 
     def _is_delivered(self) -> bool:
         for drone in self.drones:
@@ -83,24 +82,36 @@ class Simulator:
 
         return True
 
-    def _move(self, drone: Drone, connection: Connection,
-              next_hub: Hub, moves: list[str]) -> None:
-        self.conn_occupancy[connection] += 1
+    def _move(self, drone: Drone, conn: Connection, next_hub: Hub,
+              moves: list[str]) -> None:
+        self.conn_occupancy[conn] += 1
         self.hub_occupancy[next_hub] += 1
-        self.hub_occupancy[drone.current_hub] -= 1
-        drone.current_connection = connection
+
+        if drone.current_hub is not None:
+            self.hub_occupancy[drone.current_hub] -= 1
+
         drone.current_hub = None
-        drone.turns_remaining = next_hub.weight
-        drone.status = DS.IN_TRANSIT
+        drone.current_connection = conn
 
-        moves.append(f"{drone}-{connection}")
-
+        if next_hub.weight == 1:
+            self.conn_occupancy[conn] -= 1
+            drone.current_connection = None
+            drone.path_index += 1
+            drone.current_hub = next_hub
+            drone.status = DS.DELIVERED \
+                if drone.path_index == len(drone.path) - 1 else DS.WAITING
+            moves.append(f"{drone}-{next_hub}")
+        else:
+            drone.turns_remaining = next_hub.weight
+            drone.status = DS.IN_TRANSIT
+            moves.append(f"{drone}-{conn}")
 
     def _finish_move(self, drone: Drone, moves: list[str]) -> None:
         drone.turns_remaining -= 1
 
         if drone.turns_remaining == 0:
-            self.conn_occupancy[drone.current_connection] -= 1
+            if drone.current_connection is not None:
+                self.conn_occupancy[drone.current_connection] -= 1
             drone.current_connection = None
             drone.path_index += 1
             drone.current_hub = drone.path[drone.path_index]
@@ -112,4 +123,4 @@ class Simulator:
 
             moves.append(f"{drone}-{drone.current_hub}")
         else:
-            moves.append(f"{drone}-{drone.current_connection}")            
+            moves.append(f"{drone}-{drone.current_connection}")

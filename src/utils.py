@@ -1,6 +1,16 @@
 from typing import Optional, Any
 from enum import Enum
 
+PURPLE = "\33[1;35m"
+YELLOW = "\33[93m"
+GREEN = "\33[32m"
+RED = "\33[31m"
+EXIT = "\33[5;31m"
+NC = "\33[0m"
+IT = "\33[3m"
+BOLD = "\33[1m"
+CLEAR = "\33c"
+
 
 class ParserError(Exception):
     ...

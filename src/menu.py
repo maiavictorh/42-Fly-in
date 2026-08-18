@@ -1,6 +1,7 @@
 from sys import exit
 from time import sleep
 from typing import Any
+from .utils import CLEAR, PURPLE, IT, NC, BOLD, GREEN, YELLOW, RED
 
 
 class Menu:
@@ -9,15 +10,6 @@ class Menu:
 
     @staticmethod
     def run() -> Any:
-
-        PURPLE = "\33[1;35m"
-        YELLOW = "\33[93m"
-        GREEN = "\33[32m"
-        RED = "\33[31m"
-        NC = "\33[0m"
-        IT = "\33[3m"
-        BOLD = "\33[1m"
-        CLEAR = "\33c"
 
         maps = {
             "easy": {
