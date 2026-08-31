@@ -12,6 +12,7 @@ class Simulator:
             {hub: 0 for hub in self.graph.hubs.values()}
         self.conn_occupancy = \
             {conn: 0 for conn in self.graph.connections}
+        self.hub_occupancy[self.graph.start_hub] = self.graph.nb_drones
 
     def _generate_drones(self) -> list[Drone]:
         drone_list = []
@@ -31,6 +32,7 @@ class Simulator:
 
         while self._is_delivered() is False:
             moves: list[str] = []
+            instant_conns: set[Connection] = set()
 
             for drone in self.drones:
                 if drone.status == DS.IN_TRANSIT:
@@ -50,8 +52,12 @@ class Simulator:
                     continue
 
                 if self._can_move(drone, connection, next_hub):
-                    self._move(drone, connection, next_hub, moves)
+                    self._move(drone, connection, next_hub,
+                               moves, instant_conns)
 
+            for conn in instant_conns:
+                self.conn_occupancy[conn] = 0
+                    
             print("  ", " ".join(moves))
             turns += 1
 
@@ -83,7 +89,7 @@ class Simulator:
         return True
 
     def _move(self, drone: Drone, conn: Connection, next_hub: Hub,
-              moves: list[str]) -> None:
+              moves: list[str], instant_conns: set[Connection]) -> None:
         self.conn_occupancy[conn] += 1
         self.hub_occupancy[next_hub] += 1
 
@@ -94,17 +100,17 @@ class Simulator:
         drone.current_connection = conn
 
         if next_hub.weight == 1:
-            self.conn_occupancy[conn] -= 1
+            instant_conns.add(conn)
             drone.current_connection = None
             drone.path_index += 1
             drone.current_hub = next_hub
             drone.status = DS.DELIVERED \
                 if drone.path_index == len(drone.path) - 1 else DS.WAITING
-            moves.append(f"{drone}-{next_hub}")
+            moves.append(f"{drone}-{drone.current_hub}")
         else:
-            drone.turns_remaining = next_hub.weight
+            drone.turns_remaining = next_hub.weight - 1
             drone.status = DS.IN_TRANSIT
-            moves.append(f"{drone}-{conn}")
+            moves.append(f"{drone}-{drone.current_connection}")
 
     def _finish_move(self, drone: Drone, moves: list[str]) -> None:
         drone.turns_remaining -= 1
@@ -121,6 +127,4 @@ class Simulator:
             else:
                 drone.status = DS.WAITING
 
-            moves.append(f"{drone}-{drone.current_hub}")
-        else:
-            moves.append(f"{drone}-{drone.current_connection}")
+        moves.append(f"{drone}-{drone.current_hub}")
