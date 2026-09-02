@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 from .graph import Graph
 from .models import Drone, Hub, Connection
 from .utils import DroneStatus as DS
@@ -13,6 +13,7 @@ class Simulator:
         self.conn_occupancy = \
             {conn: 0 for conn in self.graph.connections}
         self.hub_occupancy[self.graph.start_hub] = self.graph.nb_drones
+        self.history: list[list[dict[str, Any]]] = []
 
     def _generate_drones(self) -> list[Drone]:
         drone_list = []
@@ -57,7 +58,13 @@ class Simulator:
 
             for conn in instant_conns:
                 self.conn_occupancy[conn] = 0
-                    
+
+            self.history.append([
+                {"id": drone.id,
+                 "location": drone.current_hub or drone.current_connection,
+                 "status": drone.status} for drone in self.drones
+            ])
+
             print("  ", " ".join(moves))
             turns += 1
 
@@ -106,11 +113,12 @@ class Simulator:
             drone.current_hub = next_hub
             drone.status = DS.DELIVERED \
                 if drone.path_index == len(drone.path) - 1 else DS.WAITING
-            moves.append(f"{drone}-{drone.current_hub}")
         else:
             drone.turns_remaining = next_hub.weight - 1
             drone.status = DS.IN_TRANSIT
-            moves.append(f"{drone}-{drone.current_connection}")
+
+        moves.append(f"{drone}-{drone.current_hub
+                                or drone.current_connection}")
 
     def _finish_move(self, drone: Drone, moves: list[str]) -> None:
         drone.turns_remaining -= 1

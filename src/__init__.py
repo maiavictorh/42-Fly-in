@@ -1,9 +1,10 @@
+from .menu import Menu
 from .parser import Parser
-from .utils import ParserError, RED, EXIT, NC, CLEAR, PURPLE, IT
 from .graph import Graph
 from .simulator import Simulator
-from .menu import Menu
+from .renderer import Renderer
+from .utils import ParserError, RED, EXIT, NC, CLEAR, PURPLE, IT
 
 
-__all__ = ["Parser", "ParserError", "Graph", "Simulator", "Menu",
-           "RED", "EXIT", "NC", "CLEAR", "PURPLE", "IT"]
+__all__ = ["Menu", "Parser", "Graph", "Simulator", "Renderer",
+           "ParserError", "RED", "EXIT", "NC", "CLEAR", "PURPLE", "IT"]

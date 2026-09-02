@@ -1,10 +1,12 @@
 import pygame
 from .graph import Graph
+from .simulator import Simulator
 
 
 class Renderer:
-    def __init__(self, graph: Graph):
+    def __init__(self, graph: Graph, simulator: Simulator):
         self.graph = graph
+        self.history = simulator.history
 
-    def render(self) -> None:
+    def run(self) -> None:
         pygame.init()
