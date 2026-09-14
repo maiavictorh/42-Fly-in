@@ -1,3 +1,4 @@
+import pygame
 from typing import Optional, Any
 from .utils import DroneStatus, ZoneType, Color
 
@@ -47,6 +48,9 @@ class Hub:
         if "max_drones" in metadata.keys():
             self.max_drones = metadata["max_drones"]
 
+    def draw_hub(self, screen: pygame.Surface, coord: tuple[int, int]) -> None:
+        pygame.draw.circle(screen, (200, 200, 200), coord, 20)
+
 
 class Connection:
     def __init__(self, hub_1: Hub, hub_2: Hub,
@@ -65,3 +69,7 @@ class Connection:
             if "max_link_capacity" in metadata.keys():
                 return metadata["max_link_capacity"]
         return 1
+
+    def draw_connetion(self, screen: pygame.Surface,
+                       coords: list[tuple[int, int]]) -> None:
+        pygame.draw.line(screen, (100, 100, 100), coords[0], coords[1], 2)

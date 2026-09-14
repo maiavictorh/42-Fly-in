@@ -15,11 +15,12 @@ class Renderer:
     def run(self) -> None:
         pygame.init()
 
-        screen = pygame.display.set_mode((1280, 720))
+        screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Fly-in")
 
-        background = pygame.image.load("background.jpg")
-        background = pygame.transform.scale(screen, (1280, 720))
+        background = pygame.image.load("background.jpg").convert()
+        background = pygame.transform.scale(background,
+                                            (self.width, self.height))
 
         clock = pygame.time.Clock()
 
@@ -39,13 +40,15 @@ class Renderer:
 
     def _draw_graph(self, screen: pygame.Surface) -> None:
         for conn in self.graph.connections:
-            pygame.draw.line(screen, (100, 100, 100),
-                             self._to_pixels(conn.hub_1.coord),
-                             self._to_pixels(conn.hub_2.coord), 2)
+            coords = [self._to_pixels(conn.hub_1.coord),
+                      self._to_pixels(conn.hub_2.coord)]
+
+            conn.draw_connetion(screen, coords)
 
         for hub in self.graph.hubs.values():
-            pygame.draw.circle(screen, (200, 200, 200),
-                               self._to_pixels(hub.coord), 20)
+            coord = self._to_pixels(hub.coord)
+
+            hub.draw_hub(screen, coord)
 
     def _compute_scale(self) -> None:
         xs = [hub.coord[0] for hub in self.graph.hubs.values()]
