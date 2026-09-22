@@ -1,6 +1,7 @@
 import pygame
 from .graph import Graph
 from .simulator import Simulator
+from .utils import Color
 
 
 class Renderer:
@@ -11,6 +12,25 @@ class Renderer:
         self.height = 720
         self.margin = 100
         self._compute_scale()
+        self.hub_colors = {
+            Color.GREEN: (0, 200, 0),
+            Color.YELLOW: (230, 200, 0),
+            Color.RED: (200, 0, 0),
+            Color.BLUE: (0, 100, 220),
+            Color.GRAY: (150, 150, 150),
+            Color.ORANGE: (255, 140, 0),
+            Color.CYAN: (0, 200, 200),
+            Color.PURPLE: (150, 0, 200),
+            Color.BROWN: (139, 69, 19),
+            Color.LIME: (150, 255, 0),
+            Color.MAGENTA: (255, 0, 255),
+            Color.GOLD: (212, 175, 55),
+            Color.BLACK: (20, 20, 20),
+            Color.MAROON: (128, 0, 0),
+            Color.DARKRED: (139, 0, 0),
+            Color.VIOLET: (150, 100, 220),
+            Color.CRIMSON: (220, 20, 60),
+        }
 
     def run(self) -> None:
         pygame.init()
@@ -18,9 +38,12 @@ class Renderer:
         screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Fly-in")
 
-        background = pygame.image.load("background.jpg").convert()
-        background = pygame.transform.scale(background,
-                                            (self.width, self.height))
+        try:
+            background = pygame.image.load("background.jpg").convert()
+            background = pygame.transform.scale(background,
+                                                (self.width, self.height))
+        except FileNotFoundError:
+            background = None
 
         clock = pygame.time.Clock()
 
@@ -30,7 +53,10 @@ class Renderer:
                 if event.type == pygame.QUIT:
                     running = False
 
-            screen.blit(background, (0, 0))
+            if background is not None:
+                screen.blit(background, (0, 0))
+            else:
+                screen.fill((15, 0, 0))
             self._draw_graph(screen)
 
             pygame.display.flip()
