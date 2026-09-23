@@ -9,7 +9,7 @@ class Renderer:
         self.graph = graph
         self.history = simulator.history
         self.width = 1280
-        self.height = 720
+        self.height = 620
         self.margin = 100
         self._compute_scale()
         self.hub_colors = {
@@ -30,6 +30,7 @@ class Renderer:
             Color.DARKRED: (139, 0, 0),
             Color.VIOLET: (150, 100, 220),
             Color.CRIMSON: (220, 20, 60),
+            Color.RAINBOW: (200, 200, 200)
         }
 
     def run(self) -> None:
@@ -74,7 +75,16 @@ class Renderer:
         for hub in self.graph.hubs.values():
             coord = self._to_pixels(hub.coord)
 
-            hub.draw_hub(screen, coord)
+            # if hub.color == Color.RAINBOW:
+            #     rainbow_colors = [color for color in self.hub_colors]
+            #     idx = (pygame.time.get_ticks() // 200) % len(rainbow_colors)
+            #     rgb = self.hub_colors[rainbow_colors[idx]]
+            #     hub.draw_hub(screen, rgb, coord)
+
+            if hub.color is not None:
+                hub.draw_hub(screen, self.hub_colors.get(hub.color), coord)
+            else:
+                hub.draw_hub(screen, (200, 200, 200), coord)
 
     def _compute_scale(self) -> None:
         xs = [hub.coord[0] for hub in self.graph.hubs.values()]

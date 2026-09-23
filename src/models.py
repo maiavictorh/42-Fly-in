@@ -48,8 +48,10 @@ class Hub:
         if "max_drones" in metadata.keys():
             self.max_drones = metadata["max_drones"]
 
-    def draw_hub(self, screen: pygame.Surface, coord: tuple[int, int]) -> None:
-        pygame.draw.circle(screen, (200, 200, 200), coord, 20)
+    def draw_hub(self, screen: pygame.Surface,
+                 rgb: tuple[int, int, int] | None,
+                 coord: tuple[int, int]) -> None:
+        pygame.draw.circle(screen, rgb, coord, 20)
 
 
 class Connection:
