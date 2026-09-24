@@ -12,6 +12,8 @@ class Renderer:
         self.height = 620
         self.margin = 100
         self._compute_scale()
+        pygame.init()
+        self.font = pygame.font.SysFont("Arial", 12, True)
         self.hub_colors = {
             Color.GREEN: (0, 200, 0),
             Color.YELLOW: (230, 200, 0),
@@ -34,7 +36,6 @@ class Renderer:
         }
 
     def run(self) -> None:
-        pygame.init()
 
         screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Fly-in")
@@ -75,16 +76,21 @@ class Renderer:
         for hub in self.graph.hubs.values():
             coord = self._to_pixels(hub.coord)
 
-            # if hub.color == Color.RAINBOW:
-            #     rainbow_colors = [color for color in self.hub_colors]
-            #     idx = (pygame.time.get_ticks() // 200) % len(rainbow_colors)
-            #     rgb = self.hub_colors[rainbow_colors[idx]]
-            #     hub.draw_hub(screen, rgb, coord)
-
-            if hub.color is not None:
+            if hub.color == Color.RAINBOW:
+                rainbow_colors = [color for color in self.hub_colors]
+                idx = (pygame.time.get_ticks() // 200) % len(rainbow_colors)
+                rgb = self.hub_colors[rainbow_colors[idx]]
+                hub.draw_hub(screen, rgb, coord)
+            elif hub.color is not None:
                 hub.draw_hub(screen, self.hub_colors.get(hub.color), coord)
             else:
                 hub.draw_hub(screen, (200, 200, 200), coord)
+
+            display_name = hub.name if len(hub.name) <= 6 else hub.name[:6]
+            label = self.font.render(display_name, True, (255, 255, 255))
+            screen.blit(label,
+                        (coord[0] - label.get_width() // 2,
+                         coord[1] - label.get_height() // 2))
 
     def _compute_scale(self) -> None:
         xs = [hub.coord[0] for hub in self.graph.hubs.values()]

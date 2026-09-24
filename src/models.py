@@ -55,6 +55,7 @@ class Hub:
 
 
 class Connection:
+
     def __init__(self, hub_1: Hub, hub_2: Hub,
                  metadata: Optional[dict[str, int]] = None) -> None:
         self.hub_1 = hub_1
