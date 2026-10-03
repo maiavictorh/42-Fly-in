@@ -2,18 +2,18 @@ import pygame
 from .graph import Graph
 from .simulator import Simulator
 from .utils import Color
+from .models import Hub, Connection
 
 
 class Renderer:
     def __init__(self, graph: Graph, simulator: Simulator):
+        pygame.init()
         self.graph = graph
         self.history = simulator.history
-        self.width = 1280
-        self.height = 620
-        self.margin = 100
+        self.width = 1680
+        self.height = 720
+        self.margin = 50
         self._compute_scale()
-        pygame.init()
-        self.font = pygame.font.SysFont("Arial", 12, True)
         self.hub_colors = {
             Color.GREEN: (0, 200, 0),
             Color.YELLOW: (230, 200, 0),
@@ -34,32 +34,51 @@ class Renderer:
             Color.CRIMSON: (220, 20, 60),
             Color.RAINBOW: (200, 200, 200)
         }
+        self.font = pygame.font.SysFont("Arial", 12, True)
+        self.current_turn = 0
+        self.playing = False
+        self.step_ms = 500
+        self.last_step = 0
 
     def run(self) -> None:
 
         screen = pygame.display.set_mode((self.width, self.height))
         pygame.display.set_caption("Fly-in")
 
-        try:
-            background = pygame.image.load("background.jpg").convert()
-            background = pygame.transform.scale(background,
-                                                (self.width, self.height))
-        except FileNotFoundError:
-            background = None
+        background = pygame.image.load("background.jpg").convert()
+        background = pygame.transform.scale(background,
+                                            (self.width, self.height))
+        drone_img = pygame.image.load("drone.png")
+        drone_img = pygame.transform.scale(drone_img, (17, 17))
 
         clock = pygame.time.Clock()
+        last_turn_index = len(self.history) - 1
 
         running = True
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     running = False
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_RIGHT:
+                        self.current_turn = min(self.current_turn + 1,
+                                                last_turn_index)
+                    elif event.key == pygame.K_LEFT:
+                        self.current_turn = max(self.current_turn - 1, 0)
+                    elif event.key == pygame.K_SPACE:
+                        self.playing = not self.playing
 
-            if background is not None:
-                screen.blit(background, (0, 0))
-            else:
-                screen.fill((15, 0, 0))
+            now = pygame.time.get_ticks()
+            if self.playing and now - self.last_step >= self.step_ms:
+                if self.current_turn < last_turn_index:
+                    self.current_turn += 1
+                    self.last_step = now
+                else:
+                    self.playing = False
+
+            screen.blit(background, (0, 0))
             self._draw_graph(screen)
+            self._draw_drones(screen, drone_img)
 
             pygame.display.flip()
             clock.tick(30)
@@ -68,13 +87,13 @@ class Renderer:
 
     def _draw_graph(self, screen: pygame.Surface) -> None:
         for conn in self.graph.connections:
-            coords = [self._to_pixels(conn.hub_1.coord),
-                      self._to_pixels(conn.hub_2.coord)]
+            coords = [self._get_hub_pixels(conn.hub_1.coord),
+                      self._get_hub_pixels(conn.hub_2.coord)]
 
             conn.draw_connetion(screen, coords)
 
         for hub in self.graph.hubs.values():
-            coord = self._to_pixels(hub.coord)
+            coord = self._get_hub_pixels(hub.coord)
 
             if hub.color == Color.RAINBOW:
                 rainbow_colors = [color for color in self.hub_colors]
@@ -92,6 +111,19 @@ class Renderer:
                         (coord[0] - label.get_width() // 2,
                          coord[1] - label.get_height() // 2))
 
+    def _draw_drones(self, screen: pygame.Surface,
+                     drone_img: pygame.Surface) -> None:
+        for entry in self.history[self.current_turn]:
+            location = entry["location"]
+
+            if isinstance(location, Hub):
+                coord = self._get_hub_pixels(location.coord)
+            elif isinstance(location, Connection):
+                coord = self._get_conn_pixels(location)
+
+            rect = drone_img.get_rect(center=coord)
+            screen.blit(drone_img, rect)
+
     def _compute_scale(self) -> None:
         xs = [hub.coord[0] for hub in self.graph.hubs.values()]
         ys = [hub.coord[1] for hub in self.graph.hubs.values()]
@@ -108,7 +140,12 @@ class Renderer:
         self.min_x = min_x
         self.min_y = min_y
 
-    def _to_pixels(self, coord: tuple[int, int]) -> tuple[int, int]:
+    def _get_hub_pixels(self, coord: tuple[int, int]) -> tuple[int, int]:
         x = (coord[0] - self.min_x) * self.scale + self.margin
         y = (coord[1] - self.min_y) * self.scale + self.margin
         return (int(x), int(y))
+
+    def _get_conn_pixels(self, conn: Connection) -> tuple[int, int]:
+        coord1 = self._get_hub_pixels(conn.hub_1.coord)
+        coord2 = self._get_hub_pixels(conn.hub_2.coord)
+        return ((coord1[0] + coord2[0]) // 2, (coord1[1] + coord2[1]) // 2)
