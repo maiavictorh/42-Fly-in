@@ -51,7 +51,7 @@ class Hub:
     def draw_hub(self, screen: pygame.Surface,
                  rgb: tuple[int, int, int] | None,
                  coord: tuple[int, int]) -> None:
-        pygame.draw.circle(screen, rgb, coord, 20)
+        pygame.draw.circle(screen, rgb, coord, 25)
 
 
 class Connection:

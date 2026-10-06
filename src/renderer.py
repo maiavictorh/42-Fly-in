@@ -1,7 +1,7 @@
 import pygame
 from .graph import Graph
 from .simulator import Simulator
-from .utils import Color
+from .utils import Color, DroneStatus as DS
 from .models import Hub, Connection
 
 
@@ -10,8 +10,8 @@ class Renderer:
         pygame.init()
         self.graph = graph
         self.history = simulator.history
-        self.width = 1680
-        self.height = 720
+        self.width = 1600
+        self.height = 900
         self.margin = 50
         self._compute_scale()
         self.hub_colors = {
@@ -49,7 +49,7 @@ class Renderer:
         background = pygame.transform.scale(background,
                                             (self.width, self.height))
         drone_img = pygame.image.load("drone.png")
-        drone_img = pygame.transform.scale(drone_img, (17, 17))
+        drone_img = pygame.transform.scale(drone_img, (20, 20))
 
         clock = pygame.time.Clock()
         last_turn_index = len(self.history) - 1
@@ -79,6 +79,7 @@ class Renderer:
             screen.blit(background, (0, 0))
             self._draw_graph(screen)
             self._draw_drones(screen, drone_img)
+            self._draw_hud(screen)
 
             pygame.display.flip()
             clock.tick(30)
@@ -105,7 +106,7 @@ class Renderer:
             else:
                 hub.draw_hub(screen, (200, 200, 200), coord)
 
-            display_name = hub.name if len(hub.name) <= 6 else hub.name[:6]
+            display_name = hub.name if len(hub.name) <= 8 else hub.name[:8]
             label = self.font.render(display_name, True, (255, 255, 255))
             screen.blit(label,
                         (coord[0] - label.get_width() // 2,
@@ -113,6 +114,8 @@ class Renderer:
 
     def _draw_drones(self, screen: pygame.Surface,
                      drone_img: pygame.Surface) -> None:
+        position_counts: dict[tuple[int, int], int] = {}
+
         for entry in self.history[self.current_turn]:
             location = entry["location"]
 
@@ -121,8 +124,31 @@ class Renderer:
             elif isinstance(location, Connection):
                 coord = self._get_conn_pixels(location)
 
-            rect = drone_img.get_rect(center=coord)
+            count = position_counts.get(coord, 0)
+            position_counts[coord] = count + 1
+
+            offset_x = (count % 3) * 10 - 10
+            offset_y = (count // 3) * 10
+            rect = drone_img.get_rect(center=(coord[0] + offset_x,
+                                              coord[1] + offset_y))
             screen.blit(drone_img, rect)
+
+    def _draw_hud(self, screen: pygame.Surface) -> None:
+        statuses = [entry["status"]
+                    for entry in self.history[self.current_turn]]
+        waiting = statuses.count(DS.WAITING)
+        in_transit = statuses.count(DS.IN_TRANSIT)
+        delivered = statuses.count(DS.DELIVERED)
+
+        info = [f"Turn: {self.current_turn}/{len(self.history) - 1}",
+                f"Waiting: {waiting}  "
+                f"In transit: {in_transit}  "
+                f"Delivered: {delivered}",]
+
+        start_y = self.height - len(info) * 18 - 10
+        for i, line in enumerate(info):
+            label = self.font.render(line, True, (255, 255, 255))
+            screen.blit(label, (10, start_y + i * 18))
 
     def _compute_scale(self) -> None:
         xs = [hub.coord[0] for hub in self.graph.hubs.values()]
