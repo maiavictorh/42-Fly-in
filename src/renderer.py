@@ -50,7 +50,7 @@ class Renderer:
         background = pygame.transform.scale(background,
                                             (self.width, self.height))
         drone_img = pygame.image.load("drone.png")
-        drone_img = pygame.transform.scale(drone_img, (50, 50))
+        drone_img = pygame.transform.scale(drone_img, (45, 45))
 
         clock = pygame.time.Clock()
         last_turn_index = len(self.history) - 1
@@ -62,9 +62,11 @@ class Renderer:
                     running = False
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_RIGHT:
+                        self.playing = False
                         self.current_turn = min(self.current_turn + 1,
                                                 last_turn_index)
                     elif event.key == pygame.K_LEFT:
+                        self.playing = False
                         self.current_turn = max(self.current_turn - 1, 0)
                     elif event.key == pygame.K_SPACE:
                         self.playing = not self.playing

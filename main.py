@@ -1,6 +1,6 @@
 from sys import exit
 from src import Menu, Parser, Simulator, Renderer, ParserError, \
-                RED, EXIT, NC, CLEAR, PURPLE, IT
+                RED, EXIT, NC, CLEAR, PURPLE, IT, YELLOW
 
 
 def main() -> None:
@@ -13,7 +13,6 @@ def main() -> None:
         graph = parser.parse()
 
         print(CLEAR)
-
         print(f" {PURPLE}┌──────────────────────────────┐")
         print(f" │            {IT}Fly-in{NC}            {PURPLE}│")
         print(f" {PURPLE}└──────────────────────────────┘{NC}\n")
@@ -24,8 +23,13 @@ def main() -> None:
         renderer = Renderer(graph, simulator)
         renderer.run()
 
-    except (ParserError, KeyboardInterrupt) as err:
+    except ParserError as err:
+        print(CLEAR)
         print(f"{RED}Error: {err}\n  {EXIT}Aborting...  {NC}")
+    except KeyboardInterrupt:
+        print(CLEAR)
+        print(f"{YELLOW}  Program Iterrupted!{NC}")
+    finally:
         exit()
 
 
