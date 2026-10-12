@@ -48,8 +48,12 @@ class Parser(Processor):
             raise ParserError("Missing nb_drones directive")
         if self.start_hub is None:
             raise ParserError("Missing start_hub directive")
+        elif self.start_hub.zone.value == "blocked":
+            raise ParserError("Invalid zone type for start hub")
         if self.end_hub is None:
             raise ParserError("Missing end_hub directive")
+        elif self.end_hub.zone.value == "blocked":
+            raise ParserError("Invalid zone type for end hub")
 
         return Graph(self.nb_drones, self.start_hub,
                      self.end_hub, self.hubs, self.connections)

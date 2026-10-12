@@ -49,9 +49,9 @@ class Hub:
             self.max_drones = metadata["max_drones"]
 
     def draw_hub(self, screen: pygame.Surface,
-                 rgb: tuple[int, int, int] | None,
+                 rgb: tuple[int, int, int],
                  coord: tuple[int, int]) -> None:
-        pygame.draw.circle(screen, rgb, coord, 25)
+        pygame.draw.circle(screen, rgb, coord, 40)
 
 
 class Connection:

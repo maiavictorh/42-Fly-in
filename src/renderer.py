@@ -10,8 +10,8 @@ class Renderer:
         pygame.init()
         self.graph = graph
         self.history = simulator.history
-        self.width = 1600
-        self.height = 900
+        self.width = 3100
+        self.height = 1080
         self.margin = 50
         self._compute_scale()
         self.hub_colors = {
@@ -34,7 +34,7 @@ class Renderer:
             Color.CRIMSON: (220, 20, 60),
             Color.RAINBOW: (200, 200, 200)
         }
-        self.font = pygame.font.SysFont("Arial", 12, True)
+        self.font = pygame.font.SysFont("Arial", 14, True)
         self.current_turn = 0
         self.playing = False
         self.step_ms = 500
@@ -42,14 +42,15 @@ class Renderer:
 
     def run(self) -> None:
 
-        screen = pygame.display.set_mode((self.width, self.height))
+        screen = pygame.display.set_mode((self.width, self.height),
+                                         pygame.SCALED)
         pygame.display.set_caption("Fly-in")
 
         background = pygame.image.load("background.jpg").convert()
         background = pygame.transform.scale(background,
                                             (self.width, self.height))
         drone_img = pygame.image.load("drone.png")
-        drone_img = pygame.transform.scale(drone_img, (20, 20))
+        drone_img = pygame.transform.scale(drone_img, (50, 50))
 
         clock = pygame.time.Clock()
         last_turn_index = len(self.history) - 1
@@ -67,6 +68,9 @@ class Renderer:
                         self.current_turn = max(self.current_turn - 1, 0)
                     elif event.key == pygame.K_SPACE:
                         self.playing = not self.playing
+                    elif event.key == pygame.K_r:
+                        self.playing = False
+                        self.current_turn = 0
 
             now = pygame.time.get_ticks()
             if self.playing and now - self.last_step >= self.step_ms:
@@ -102,7 +106,7 @@ class Renderer:
                 rgb = self.hub_colors[rainbow_colors[idx]]
                 hub.draw_hub(screen, rgb, coord)
             elif hub.color is not None:
-                hub.draw_hub(screen, self.hub_colors.get(hub.color), coord)
+                hub.draw_hub(screen, self.hub_colors[hub.color], coord)
             else:
                 hub.draw_hub(screen, (200, 200, 200), coord)
 

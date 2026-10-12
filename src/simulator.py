@@ -31,6 +31,12 @@ class Simulator:
 
         turns = 0
 
+        self.history.append([
+            {"id": d.id,
+             "location": d.current_hub,
+             "status": d.status} for d in self.drones
+        ])
+
         while self._is_delivered() is False:
             moves: list[str] = []
             instant_conns: set[Connection] = set()
@@ -117,8 +123,8 @@ class Simulator:
             drone.turns_remaining = next_hub.weight - 1
             drone.status = DS.IN_TRANSIT
 
-        moves.append(f"{drone}-{drone.current_hub
-                                or drone.current_connection}")
+        moves.append(f"{drone}-"
+                     f"{drone.current_hub or drone.current_connection}")
 
     def _finish_move(self, drone: Drone, moves: list[str]) -> None:
         drone.turns_remaining -= 1
