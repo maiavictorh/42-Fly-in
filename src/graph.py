@@ -1,6 +1,7 @@
 from typing import Optional
 from heapq import heappop, heappush
 from .models import Hub, Connection
+from .utils import ZoneType as ZT
 
 
 class Graph:
@@ -61,6 +62,8 @@ class Graph:
                 break
 
             for neighbor, weight in adjacency[current_hub]:
+                if neighbor.zone == ZT.BLOCKED:
+                    continue
 
                 new_distance = current_distance + weight
 

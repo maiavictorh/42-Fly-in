@@ -39,16 +39,20 @@ class Simulator:
 
         while self._is_delivered() is False:
             moves: list[str] = []
+            arrived = set()
             instant_conns: set[Connection] = set()
 
             for drone in self.drones:
                 if drone.status == DS.IN_TRANSIT:
                     self._finish_move(drone, moves)
+                    arrived.add(drone)
 
             for drone in self.drones:
                 if drone.status == DS.DELIVERED:
                     continue
                 if drone.status == DS.IN_TRANSIT:
+                    continue
+                if drone in arrived:
                     continue
 
                 next_hub = drone.path[drone.path_index + 1]
@@ -61,6 +65,8 @@ class Simulator:
                 if self._can_move(drone, connection, next_hub):
                     self._move(drone, connection, next_hub,
                                moves, instant_conns)
+                if drone in arrived:
+                    arrived.remove(drone)
 
             for conn in instant_conns:
                 self.conn_occupancy[conn] = 0

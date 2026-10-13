@@ -73,6 +73,8 @@ class Renderer:
                     elif event.key == pygame.K_r:
                         self.playing = False
                         self.current_turn = 0
+                    elif event.key == pygame.K_q:
+                        pygame.quit()
 
             now = pygame.time.get_ticks()
             if self.playing and now - self.last_step >= self.step_ms:
@@ -112,7 +114,7 @@ class Renderer:
             else:
                 hub.draw_hub(screen, (200, 200, 200), coord)
 
-            display_name = hub.name if len(hub.name) <= 8 else hub.name[:8]
+            display_name = hub.name if len(hub.name) <= 10 else hub.name[:10]
             label = self.font.render(display_name, True, (255, 255, 255))
             screen.blit(label,
                         (coord[0] - label.get_width() // 2,

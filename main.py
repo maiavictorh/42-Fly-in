@@ -28,7 +28,7 @@ def main() -> None:
         print(f"{RED}Error: {err}\n  {EXIT}Aborting...  {NC}")
     except KeyboardInterrupt:
         print(CLEAR)
-        print(f"{YELLOW}  Program Iterrupted!{NC}")
+        print(f"{YELLOW}  Program Interrupted!{NC}")
     finally:
         exit()
 
