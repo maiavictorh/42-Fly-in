@@ -5,12 +5,26 @@ from .utils import CLEAR, PURPLE, IT, NC, BOLD, GREEN, YELLOW, RED
 
 
 class Menu:
+    """Terminal menu that lets the user choose a map by difficulty."""
     def __init__(self) -> None:
+        """Initialize the menu (no state is required)."""
         pass
 
     @staticmethod
     def run() -> Any:
+        """
+        Display the menu and block until a map is chosen.
 
+        Shows the difficulty selection screen and, for easy, medium and
+        hard, a second screen listing the maps of that difficulty.
+        Invalid inputs show a warning and redisplay the menu. Typing
+        "q" or "quit" exits the program from the main screen, or goes
+        back to the main screen from a difficulty submenu.
+
+        Returns:
+            The path of the chosen map file, or "config.txt" if the
+            custom option was selected.
+        """
         maps = {
             "easy": {
                 "1": "maps/easy/01_linear_path.txt",

@@ -18,7 +18,8 @@ def main() -> None:
         print(f" {PURPLE}└──────────────────────────────┘{NC}\n")
 
         simulator = Simulator(graph)
-        simulator.run()
+        if simulator.run() is False:
+            print(f"{RED}  No valid path found!{NC}")
 
         renderer = Renderer(graph, simulator)
         renderer.run()
@@ -28,7 +29,7 @@ def main() -> None:
         print(f"{RED}Error: {err}\n  {EXIT}Aborting...  {NC}")
     except KeyboardInterrupt:
         print(CLEAR)
-        print(f"{YELLOW}  Program Interrupted!{NC}")
+        print(f"  {YELLOW}Program Interrupted!{NC}")
     finally:
         exit()
 

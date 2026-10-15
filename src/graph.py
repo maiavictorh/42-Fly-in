@@ -5,11 +5,25 @@ from .utils import ZoneType as ZT
 
 
 class Graph:
+    """Network of hubs and connections used by the simulation."""
     def __init__(self, nb_drones: int,
                  start_hub: Hub,
                  end_hub: Hub,
                  hubs: dict[str, Hub],
                  connections: list[Connection]) -> None:
+        """
+        Initialize the graph.
+
+        The start and end hubs have their max_drones set to nb_drones,
+        so they are never limited by capacity.
+
+        Args:
+            nb_drones: Total number of drones in the fleet.
+            start_hub: Hub where every drone begins.
+            end_hub: Hub where every drone must arrive.
+            hubs: All hubs, indexed by name.
+            connections: All connections between hubs.
+        """
         self.nb_drones = nb_drones
         self.start_hub = start_hub
         self.start_hub.max_drones = self.nb_drones
@@ -19,6 +33,14 @@ class Graph:
         self.connections = connections
 
     def find_path(self) -> list[Hub]:
+        """
+        Find the cheapest path from the start hub to the end hub.
+
+        Returns:
+            The ordered list of hubs from start to end (both included),
+            a single-element list if start and end are the same hub, or
+            an empty list if the end hub is unreachable.
+        """
         path: list[Hub] = []
 
         adjacency = self._build_adjacency()
@@ -42,7 +64,21 @@ class Graph:
             self, start: Hub, end: Hub,
             adjacency: dict[Hub, list[tuple[Hub, int]]]
             ) -> dict[Hub, Optional[Hub]]:
+        """
+        Run Dijkstra's algorithm from start, stopping once end is reached.
 
+        Blocked hubs are never entered. Ties in the heap are broken by
+        insertion order through a counter.
+
+        Args:
+            start: Hub where the search begins.
+            end: Hub where the search stops early.
+            adjacency: Neighbors of each hub as (hub, weight) pairs.
+
+        Returns:
+            A dict mapping each hub to its predecessor on the cheapest
+            known path, or None if it has none (start or unreached).
+        """
         distances = {hub: float("inf") for hub in adjacency}
         distances[start] = 0
         previous: dict[Hub, Optional[Hub]] = {hub: None for hub in adjacency}
@@ -77,6 +113,14 @@ class Graph:
         return previous
 
     def _build_adjacency(self) -> dict[Hub, list[tuple[Hub, int]]]:
+        """
+        Build the bidirectional adjacency list from the connections.
+
+        The weight of each edge is the weight of the hub being entered.
+
+        Returns:
+            A dict mapping each hub to a list of (neighbor, weight) pairs.
+        """
         adjacency: dict[Hub, list[tuple[Hub, int]]] = \
             {h: [] for h in self.hubs.values()}
 

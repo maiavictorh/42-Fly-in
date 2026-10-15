@@ -73,7 +73,7 @@ class Renderer:
                     elif event.key == pygame.K_r:
                         self.playing = False
                         self.current_turn = 0
-                    elif event.key == pygame.K_q:
+                    elif event.key == pygame.K_ESCAPE:
                         pygame.quit()
 
             now = pygame.time.get_ticks()
