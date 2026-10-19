@@ -10,6 +10,8 @@ class Parser(Processor):
 
         Args:
             file_name: Path of the map file to parse.
+
+        Attributes:
             nb_drones: Number of drones stored by the parser.
             start_hub: start_hub stored by the parser.
             end_hub: end_hub stored by the parser.

@@ -15,6 +15,8 @@ class Simulator:
 
         Args:
             graph: Graph describing hubs, connections and fleet size.
+
+        Attributes:
             drones: drones fleet, the main simulation attribute.
             hub_occupancy: counts how many drones are currently in the hub,
                            used to prevent capacity problems.
@@ -99,8 +101,6 @@ class Simulator:
                 if self._can_move(drone, connection, next_hub):
                     self._move(drone, connection, next_hub,
                                moves, instant_conns)
-                if drone in arrived:
-                    arrived.remove(drone)
 
             for conn in instant_conns:
                 self.conn_occupancy[conn] = 0

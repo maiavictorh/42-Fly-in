@@ -6,33 +6,59 @@ from .models import Hub, Connection
 
 
 class Renderer:
+    """Window that draws the graph and animates the drones' movements."""
     def __init__(self, graph: Graph, simulator: Simulator):
+        """
+        Initialize pygame, the color palette and the playback state.
+
+        The coordinate scale is computed here so the whole graph fits
+        inside the window.
+
+        Args:
+            graph: Graph to draw.
+            simulator: Simulator whose history will be replayed; it must
+                have been run already.
+
+        Attributes:
+            history: drones' state information at each simulation turn
+            width: screen's width in pixels, set as an arbitrary size
+            height: screen's height in pixels, set as an arbitrary size
+            margin: margin between screen edge and graph drawing
+            hub_colors: supported colors for hubs
+            font: text font and size for information display
+            current_turn: counts the simulation steps
+            playing: controls whether the simulation is in automatic movement
+            step_ms: controls in milliseconds (ms)
+                     the speed of the drones' moves
+            last_step: Time in ms (pygame ticks) of the last automatic turn
+                       advance, compared against step_ms to pace the autoplay.
+        """
         pygame.init()
         self.graph = graph
         self.history = simulator.history
-        self.width = 3100
-        self.height = 1080
+        self.width = 1900
+        self.height = 1000
         self.margin = 50
         self._compute_scale()
         self.hub_colors = {
-            Color.GREEN: (0, 200, 0),
-            Color.YELLOW: (230, 200, 0),
-            Color.RED: (200, 0, 0),
-            Color.BLUE: (0, 100, 220),
+            Color.GREEN: (0, 150, 0),
+            Color.YELLOW: (180, 150, 0),
+            Color.RED: (150, 0, 0),
+            Color.BLUE: (0, 50, 170),
             Color.GRAY: (150, 150, 150),
-            Color.ORANGE: (255, 140, 0),
-            Color.CYAN: (0, 200, 200),
-            Color.PURPLE: (150, 0, 200),
-            Color.BROWN: (139, 69, 19),
+            Color.ORANGE: (205, 90, 0),
+            Color.CYAN: (0, 150, 150),
+            Color.PURPLE: (150, 0, 150),
+            Color.BROWN: (139, 19, 0),
             Color.LIME: (150, 255, 0),
-            Color.MAGENTA: (255, 0, 255),
-            Color.GOLD: (212, 175, 55),
+            Color.MAGENTA: (205, 0, 205),
+            Color.GOLD: (172, 125, 5),
             Color.BLACK: (20, 20, 20),
-            Color.MAROON: (128, 0, 0),
-            Color.DARKRED: (139, 0, 0),
-            Color.VIOLET: (150, 100, 220),
-            Color.CRIMSON: (220, 20, 60),
-            Color.RAINBOW: (200, 200, 200)
+            Color.MAROON: (178, 0, 0),
+            Color.DARKRED: (89, 0, 0),
+            Color.VIOLET: (150, 100, 170),
+            Color.CRIMSON: (170, 0, 10),
+            Color.RAINBOW: (150, 150, 150)
         }
         self.font = pygame.font.SysFont("Arial", 14, True)
         self.current_turn = 0
@@ -41,16 +67,28 @@ class Renderer:
         self.last_step = 0
 
     def run(self) -> None:
+        """
+        Open the window and run the display loop until it is closed.
 
+        Controls: LEFT/RIGHT step backward/forward, SPACE toggles
+        autoplay, R restarts from turn 0 and ESC or closing the window
+        quits.
+        """
         screen = pygame.display.set_mode((self.width, self.height),
                                          pygame.SCALED)
         pygame.display.set_caption("Fly-in")
 
-        background = pygame.image.load("background.jpg").convert()
-        background = pygame.transform.scale(background,
-                                            (self.width, self.height))
-        drone_img = pygame.image.load("drone.png")
-        drone_img = pygame.transform.scale(drone_img, (45, 45))
+        try:
+            background = pygame.image.load("assets/background.jpg").convert()
+            background = pygame.transform.scale(background,
+                                                (self.width, self.height))
+        except FileNotFoundError:
+            background = None
+        try:
+            drone_img = pygame.image.load("assets/drone.png")
+            drone_img = pygame.transform.scale(drone_img, (45, 45))
+        except FileNotFoundError:
+            drone_img = None
 
         clock = pygame.time.Clock()
         last_turn_index = len(self.history) - 1
@@ -84,7 +122,10 @@ class Renderer:
                 else:
                     self.playing = False
 
-            screen.blit(background, (0, 0))
+            if background is not None:
+                screen.blit(background, (0, 0))
+            else:
+                screen.fill((15, 0, 0))
             self._draw_graph(screen)
             self._draw_drones(screen, drone_img)
             self._draw_hud(screen)
@@ -95,6 +136,16 @@ class Renderer:
         pygame.quit()
 
     def _draw_graph(self, screen: pygame.Surface) -> None:
+        """
+        Draw every connection, then every hub with its name.
+
+        Hubs with the rainbow color cycle through the palette over time.
+        Hubs without a color are drawn in light gray, and names longer
+        than 10 characters are truncated.
+
+        Args:
+            screen: Surface to draw on.
+        """
         for conn in self.graph.connections:
             coords = [self._get_hub_pixels(conn.hub_1.coord),
                       self._get_hub_pixels(conn.hub_2.coord)]
@@ -106,7 +157,7 @@ class Renderer:
 
             if hub.color == Color.RAINBOW:
                 rainbow_colors = [color for color in self.hub_colors]
-                idx = (pygame.time.get_ticks() // 200) % len(rainbow_colors)
+                idx = (pygame.time.get_ticks() // 180) % len(rainbow_colors)
                 rgb = self.hub_colors[rainbow_colors[idx]]
                 hub.draw_hub(screen, rgb, coord)
             elif hub.color is not None:
@@ -121,10 +172,23 @@ class Renderer:
                          coord[1] - label.get_height() // 2))
 
     def _draw_drones(self, screen: pygame.Surface,
-                     drone_img: pygame.Surface) -> None:
+                     drone_img: pygame.Surface | None) -> None:
+        """
+        Draw the drones at their positions in the current turn.
+
+        Drones on a hub are drawn at its center and drones on a
+        connection at its midpoint. Drones sharing a position are
+        offset so they do not fully overlap.
+
+        Args:
+            screen: Surface to draw on.
+            drone_img: Sprite used for each drone.
+        """
         position_counts: dict[tuple[int, int], int] = {}
+        radius = 14
 
         for entry in self.history[self.current_turn]:
+            id = f"D{entry["id"]}"
             location = entry["location"]
 
             if isinstance(location, Hub):
@@ -135,13 +199,24 @@ class Renderer:
             count = position_counts.get(coord, 0)
             position_counts[coord] = count + 1
 
-            offset_x = (count % 3) * 10 - 10
-            offset_y = (count // 3) * 10
-            rect = drone_img.get_rect(center=(coord[0] + offset_x,
-                                              coord[1] + offset_y))
-            screen.blit(drone_img, rect)
+            center = (coord[0] + (count % 3) * 10 - 10,
+                    coord[1] + (count // 3) * 10)
+
+            if drone_img is not None:
+                screen.blit(drone_img, drone_img.get_rect(center=center))
+            else:
+                pygame.draw.circle(screen, (250, 250, 250), center, radius)
+                pygame.draw.circle(screen, (130, 130, 130), center, radius, 2)
+                label = self.font.render(id, True, (0, 0, 0))
+                screen.blit(label, label.get_rect(center=center))
 
     def _draw_hud(self, screen: pygame.Surface) -> None:
+        """
+        Draw the turn counter and the drone status totals.
+
+        Args:
+            screen: Surface to draw on.
+        """
         statuses = [entry["status"]
                     for entry in self.history[self.current_turn]]
         waiting = statuses.count(DS.WAITING)
@@ -159,6 +234,13 @@ class Renderer:
             screen.blit(label, (10, start_y + i * 18))
 
     def _compute_scale(self) -> None:
+        """
+        Compute the scale and origin that fit all hubs in the window.
+
+        The same scale is used on both axes to keep the aspect ratio,
+        and a zero-width range is treated as 1 to avoid division by zero.
+        Sets self.scale, self.min_x and self.min_y.
+        """
         xs = [hub.coord[0] for hub in self.graph.hubs.values()]
         ys = [hub.coord[1] for hub in self.graph.hubs.values()]
         min_x, max_x = min(xs), max(xs)
@@ -175,11 +257,31 @@ class Renderer:
         self.min_y = min_y
 
     def _get_hub_pixels(self, coord: tuple[int, int]) -> tuple[int, int]:
+        """
+        Convert grid coordinates into screen pixels.
+
+        Args:
+            coord: Hub position on the grid as (x, y).
+
+        Returns:
+            The matching position in pixels.
+        """
+
         x = (coord[0] - self.min_x) * self.scale + self.margin
         y = (coord[1] - self.min_y) * self.scale + self.margin
         return (int(x), int(y))
 
     def _get_conn_pixels(self, conn: Connection) -> tuple[int, int]:
+        """
+        Get the screen position of a connection's midpoint.
+
+        Args:
+            conn: Connection to locate.
+
+        Returns:
+            The midpoint between its two hubs, in pixels.
+        """
         coord1 = self._get_hub_pixels(conn.hub_1.coord)
+
         coord2 = self._get_hub_pixels(conn.hub_2.coord)
         return ((coord1[0] + coord2[0]) // 2, (coord1[1] + coord2[1]) // 2)

@@ -11,6 +11,9 @@ class Drone:
 
         Args:
             id: Unique drone identifier.
+            start_hub: Hub where the drone begins.
+
+        Attributes:
             status: current drone movement status, defaults to "waiting".
             path: path to follow set by the algorithm.
             path_index: current position in the path.
