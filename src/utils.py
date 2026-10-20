@@ -155,7 +155,7 @@ class Processor:
             if d[0] == "zone":
                 if d[1] not in valid_zones:
                     raise ParserError(
-                        f"Invalid metadata zone in line: {line_index}")
+                        f"Invalid zone type in line: {line_index}")
             if d[0] == "color":
                 if not d[1].isalpha():
                     raise ParserError(

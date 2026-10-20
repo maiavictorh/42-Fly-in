@@ -1,4 +1,4 @@
-*This project has been created as part of the 42 curriculum by <your_login>.*
+*This project has been created as part of the 42 curriculum by victode-.*
 
 # Fly-in
 
@@ -29,6 +29,9 @@ The map is described in a custom text file, parsed and validated by the program,
 ```bash
 make install   # creates .venv and installs the dependencies
 make run       # launches the program
+
+# or simply:
+make  # runs 'make install' and 'make run' all at once
 ```
 
 Other Makefile rules:
@@ -118,8 +121,7 @@ The `assets/` files are optional: without them the renderer falls back to a plai
 
 The map is converted into a bidirectional adjacency list where the weight of an edge is the **cost of entering the destination hub**, stored as a tuple `(turns, -priority)`:
 
-- `turns` is `2` for `restricted` zones and `1` otherwise;
-- `-priority` is `-1` when the destination is a `priority` zone and `0` otherwise.
+- `turns` is `2` for `restricted` zones, `0` for `priority` zones and `1` otherwise;
 
 Dijkstra (with a binary heap and an insertion counter as heap tie-breaker) compares these costs lexicographically, so it first minimizes the number of turns and, between paths with the same number of turns, prefers the one crossing more `priority` zones. It never enters `blocked` hubs. If the end hub is unreachable, the program reports that no valid path was found.
 
@@ -147,13 +149,10 @@ The `Renderer` computes one scale for both axes so the whole graph fits in the w
 
 ## Resources
 
-- [Dijkstra's algorithm](https://en.wikipedia.org/wiki/Dijkstra%27s_algorithm)
+- [Dijkstra's algorithm](https://www.w3schools.com/dsa/dsa_algo_graphs_dijkstra.php)
 - [Python `heapq` documentation](https://docs.python.org/3/library/heapq.html)
-- [Pygame documentation](https://www.pygame.org/docs/)
-- [PEP 484 – Type Hints](https://peps.python.org/pep-0484/)
-- [PEP 257 – Docstring Conventions](https://peps.python.org/pep-0257/)
-- 42 project subject (`en_subject.pdf`)
+- [Pygame documentation](https://www.geeksforgeeks.org/python/pygame-tutorial/)
 
 ### Use of AI
 
-<!-- Describe honestly which tasks AI helped with (e.g. design discussions, code review, README writing) and which parts you wrote and validated yourself. -->
+AI tools were used to assist with documentation drafting, design discussions exploring edge cases in the graph validation logic, and reviewing the dijkstra and simulator implementation. All output was critically reviewed and validated against the subject requirements and tested manually.

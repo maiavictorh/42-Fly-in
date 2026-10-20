@@ -36,8 +36,8 @@ class Renderer:
         pygame.init()
         self.graph = graph
         self.history = simulator.history
-        self.width = 1900
-        self.height = 1000
+        self.width = 2600
+        self.height = 920
         self.margin = 50
         self._compute_scale()
         self.hub_colors = {
@@ -188,7 +188,7 @@ class Renderer:
         radius = 14
 
         for entry in self.history[self.current_turn]:
-            id = f"D{entry["id"]}"
+            id = f"D{entry['id']}"
             location = entry["location"]
 
             if isinstance(location, Hub):
@@ -200,7 +200,7 @@ class Renderer:
             position_counts[coord] = count + 1
 
             center = (coord[0] + (count % 3) * 10 - 10,
-                    coord[1] + (count // 3) * 10)
+                      coord[1] + (count // 3) * 10)
 
             if drone_img is not None:
                 screen.blit(drone_img, drone_img.get_rect(center=center))

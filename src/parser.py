@@ -17,7 +17,6 @@ class Parser(Processor):
             end_hub: end_hub stored by the parser.
             hubs: dict of hubs_names and hubs stored by the parser.
             connections: list of connections stored by the parser.
-            end_conn_flag: flag for checking end_hub connectivity.
         """
         super().__init__()
         self.file_name = file_name
@@ -26,7 +25,6 @@ class Parser(Processor):
         self.end_hub: Hub | None = None
         self.hubs: dict[str, Hub] = {}
         self.connections: list[Connection] = []
-        self.end_conn_flag = False
 
     def parse(self) -> Graph:
         """
@@ -72,18 +70,12 @@ class Parser(Processor):
 
                 checked_pairs: set[frozenset[Hub | None]] = set()
                 for connection in self.connections:
-                    if self.end_hub == connection.hub_1 \
-                       or self.end_hub == connection.hub_2:
-                        self.end_conn_flag = True
 
                     conn_pair = frozenset((connection.hub_1, connection.hub_2))
                     if conn_pair in checked_pairs:
                         raise ParserError(
                             f"Duplicated connection in line: {line_index}")
                     checked_pairs.add(conn_pair)
-
-            if self.end_conn_flag is False:
-                raise ParserError("Missing connection with end_hub")
 
         if self.nb_drones is None:
             raise ParserError("Missing nb_drones directive")

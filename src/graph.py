@@ -100,6 +100,10 @@ class Graph:
             for neighbor, weight in adjacency[current_hub]:
                 if neighbor.zone == ZT.BLOCKED:
                     continue
+                if neighbor.zone == ZT.PRIORITY:
+                    weight -= 1
+
+                print(neighbor.name, weight)
 
                 new_distance = current_distance + weight
 
