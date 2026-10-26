@@ -164,8 +164,7 @@ class Simulator:
         """
         if drone.status == DS.DELIVERED \
            or drone.current_connection is not None \
-           or self.conn_occupancy[conn] >= conn.max_link_capacity \
-           or self.hub_occupancy[next_hub] >= next_hub.max_drones:
+           or self.conn_occupancy[conn] >= conn.max_link_capacity:
             return False
 
         return True

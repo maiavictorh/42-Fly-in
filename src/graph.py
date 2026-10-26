@@ -103,8 +103,6 @@ class Graph:
                 if neighbor.zone == ZT.PRIORITY:
                     weight -= 1
 
-                print(neighbor.name, weight)
-
                 new_distance = current_distance + weight
 
                 if new_distance < distances[neighbor]:
