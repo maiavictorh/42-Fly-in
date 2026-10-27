@@ -6,7 +6,7 @@ from .utils import DroneStatus as DS
 
 class Simulator:
     """Run the fleet along the shortest path, respecting all capacities."""
-    def __init__(self, graph: Graph) -> None:
+    def __init__(self, graph: Graph, flag: bool) -> None:
         """
         Initialize the simulator.
 
@@ -32,6 +32,7 @@ class Simulator:
             {conn: 0 for conn in self.graph.connections}
         self.hub_occupancy[self.graph.start_hub] = self.graph.nb_drones
         self.history: list[list[dict[str, Any]]] = []
+        self.flag = flag
 
     def _generate_drones(self) -> list[Drone]:
         """
@@ -113,6 +114,8 @@ class Simulator:
 
             print("  ", " ".join(moves))
             turns += 1
+            if self.flag is True:
+                self.print_info()
 
         print("\n   Turns:", turns)
 
@@ -235,3 +238,13 @@ class Simulator:
                 drone.status = DS.WAITING
 
         moves.append(f"{drone}-{drone.current_hub}")
+
+    def print_info(self) -> None:
+
+        for hub, used in self.hub_occupancy.items():
+            if used:
+                print(f"   {hub}: {used}/{hub.max_drones}", end="")
+        for conn, used in self.conn_occupancy.items():
+            if used:
+                print(f"   {conn}: {used}/{conn.max_link_capacity}", end="")
+        print()
